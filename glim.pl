@@ -67,18 +67,17 @@ sub grub_grub2_choice {
       say "Found grub2-install";
       $grubversion->{installer} = 'grub2-install';
       $grubversion->{configdir} = 'grub2';
-      return $grubversion;
     } else {
         $path = `which grub-install 2>/dev/null`;
         if($? == 0 && $path =~ /^\/.*grub-install$/) {
           say "Found 'grub-install'";
           $grubversion->{installer} = 'grub-install';
           $grubversion->{configdir} = 'grub';
-          return $grubversion;
         } else {
           myerror "'grub2-install' or grub-install commands not found.";
         }
     }
+    return $grubversion;
 }
 
 sub find_and_check_grub_dir {
@@ -126,6 +125,8 @@ sub mount {
       mysystem("mount $part $dir");
       $mounts->{$part} = $dir;
     }
+    say "All specified partitions are now mounted.";
+    return $mounts;
 }
 
 sub check_bios_efi_support {
