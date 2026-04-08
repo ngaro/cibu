@@ -177,8 +177,13 @@ sub create_iso_dirs {
     $distroconfig =~ /^.*\/inc-(\S+)\.cfg$/ or next;
     mysystem("mkdir -p '$isomnt/iso/$1'");
   }
+  mysystem("chown -R $wanteduid:$wantedgid '$isomnt/iso'");
   say "Directory layout for ISO files created.";
 }
+
+my $wanteduid = 1000;
+my $wantedgid = 1000;
+my $usbdev = '/dev/sdb'; #TODO receive this from the previous script
 
 showdisclaimer();
 ask_for_confirmation("If you have read, understood & fully accepted the above, then please enter 'yes' otherwise enter 'no' to cancel: ");
@@ -186,12 +191,8 @@ check_root();
 say ""; check_available_programs(qw(mount mktemp rsync mount umount mkdir));
 say ""; my $grubversion = grub_grub2_choice();
 say ""; my $grubconfigdir = find_and_check_grub_dir();
-my $usbdev = '/dev/sdb'; #TODO receive this from the previous script
-my $part1 = '/dev/sdb1'; #TODO receive this from the previous script
-my $part2 = '/dev/sdb2'; #TODO receive this from the previous script
-my $part3 = '/dev/sdb3'; #TODO receive this from the previous script
-my $BiosBoot = '21686148-6449-6e6f-744e-656564454649'; #TODO receive this from the previous script
-my $NumOfPartitionsExpected = 3;
+my $part1 = $usbdev . '1';
+my $part2 = $usbdev . '2';
 say ""; umount($part1, $part2);
 say ""; my $mounts = mount($part1, $part2);
 say ""; my $support = check_bios_efi_support();
