@@ -83,7 +83,7 @@ sub grub_grub2_choice {
 
 sub find_and_check_grub_dir {
     my $grubconfigdir = $FindBin::Bin . '/grub2';
-    return $grubconfigdir if -f "$grub_dir/grub.cfg";
+    return $grubconfigdir if -d $grubconfigdir && -f "$grubconfigdir/grub.cfg";
     myerror "grub.cfg not found.";
 }
 
