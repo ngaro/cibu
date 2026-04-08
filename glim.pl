@@ -171,7 +171,7 @@ sub copy_grub_config {
 }
 
 sub create_iso_dirs {
-  my ($isomnt, $grubconfigdir) = @_;
+  my ($isomnt, $grubconfigdir, $wanteduid, $wantedgid) = @_;
   say "Creating the directory layout for the partition for ISO files...";
   for my $distroconfig (glob("$grubconfigdir/*")) {
     $distroconfig =~ /^.*\/inc-(\S+)\.cfg$/ or next;
@@ -198,4 +198,4 @@ say ""; my $mounts = mount($part1, $part2);
 say ""; my $support = check_bios_efi_support();
 say ""; install_grub($grubversion->{installer}, $support, $mounts->{$part1}, $usbdev);
 say ""; copy_grub_config($grubconfigdir, "$mounts->{$part1}/boot/$grubversion->{configdir}");
-say ""; create_iso_dirs($mounts->{$part2}, $grubconfigdir);
+say ""; create_iso_dirs($mounts->{$part2}, $grubconfigdir, $wanteduid, $wantedgid);
