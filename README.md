@@ -1,7 +1,7 @@
 GRUB2 Live ISO Multiboot
 ========================
 
-This version: https://github.com/cshandley-uk/bash_glim
+This version: https://github.com/ngaro/bash_glim
 
 Forked from:  https://github.com/thias/glim | https://glee.thias.es/GLIM
 
@@ -9,105 +9,50 @@ Forked from:  https://github.com/thias/glim | https://glee.thias.es/GLIM
 Overview
 --------
 
-GLIM is a set of grub configuration files to turn a simple VFAT or FAT32 
-formatted USB memory stick containing many GNU/Linux distribution ISO images 
-into a neat device from which many different Live environments can be used.
-
-Advantages over extracting files or using special Live USB creation tools :
-
- * A single USB memory can hold all Live environments (the limit is its size)
- * ISO images stay available to burn real CDs or DVDs
- * ISO images are quick to manipulate (vs. hundreds+ files)
+GLIM is a tool to create a bootmedium (usually a USB stick) that can boot 
+multiple ISO images from different operating systems, using GRUB2
+as the bootloader. This is meant for users that don't want to carry around
+multiple USB sticks, each with a different iso to run as live environments
+(or install from), but instead want to have them all on a single USB stick.
 
 Disadvantages :
 
- * There is no persistence overlay for distributions which normally support it
- * Setting up isn't as easy as a simple cat from the ISO image to a block device
-
-As modern Linux ISOs often exceed the 4GB file size limit of FAT32, GLIM now 
-supports a second partition using other filesystems supported by GRUB2, such as 
-ext3/ext4, NTFS or exFAT - but the distribution must also support booting from 
-it, which isn't the case for many with NTFS (Ubuntu does, Fedora doesn't) and 
-exFAT (Ubuntu doesn't, Fedora does).  Ext4 is a safe bet for the second 
-partition.
+ * There is no persistence overlay for distributions which normally support it.
+ * Not all operating systems are supported/tested.
 
 Screenshots
 -----------
 
-![Main Menu](https://github.com/thias/glim/raw/master/screenshots/GLIM-3.0-shot1.png)
-![Ubuntu Submenu](https://github.com/thias/glim/raw/master/screenshots/GLIM-3.0-shot2.png)
+![Main Menu](https://github.com/ngaro/glim/raw/master/screenshots/GLIM-3.0-shot1.png)
+![Ubuntu Submenu](https://github.com/ngaro/glim/raw/master/screenshots/GLIM-3.0-shot2.png)
 
 
-Recent changes
+Differences from the original GLIM (from thias)
 --------------
 
-* GLIM now easily supports ISO files >4GB through the use of a second partition,
-although you can still use a single partition if you want.
+* GLIM now supports ISO files >4GB through the use of a second partition.
 
 * The ISO folder has been moved from `boot/iso/` to just `iso/`, so that it's 
 easier to find, and also is in the same location whether you use one or two 
 partitions.
 
-* Added the `format_empty_disk.sh` script.
-
-
-Requirements
-------------
-
-You need a USB memory stick (or external hard drive!) partitioned & formatted 
-one of the following ways:
-
-1. A single partition formatted as FAT32 with the filesystem label `GLIM`. 
-You can use MBR or GPT as needed (but legacy BIOS may need MBR).
-
-or
-
-2. Two partitions.  The small first partition must be formatted as FAT32 with 
-the filesystem label `GLIM`, I suggest 100MB in size.  The second partition 
-should be formatted as Ext4 with the filesystem label `GLIMISO`.  
-
-It's best if the USB stick uses MBR, but if it uses GPT (as GNOME's Disks 
-utility does) then GRUB only supports installing for EFI (not BIOS) - unless you 
-add a third BIOS Boot partition.  GLIM needs the BIOS Boot partition to come 
-after the other two partitions.  See the link below for details on how to create 
-a BIOS Boot partition:
-
-https://wiki.archlinux.org/title/GRUB#GUID_Partition_Table_(GPT)_specific_instructions
-
-But basically create an unformatted 1MB partition at the end of the disk, then 
-change it's partition type to "BIOS Boot" (which has the 
-GUID `21686148-6449-6E6F-744E-656564454649`).  You can do this with GNOME's 
-Disks utility, without resorting to the terminal!
-
-Or if you find partitioning difficult, then you can try using my experimental 
-new script `format_empty_disk.sh`, which will ask you a few questions before 
-before setting-up an empty disk with GLIM's recommended two partition GPT set-up 
-(plus a BIOS Boot partition), ready to use with `glim.sh` itself.  I've tried to 
-make it safe, so for example it shouldn't delete any partitions, only create new 
-ones... And in the event of any errors, the script should stop rather than risk 
-doing anything wrong. HOWEVER, it is still a very new script, which likely 
-contains bugs, especially on systems different to my own, so please let me know 
-about any problems you experience.  You use this script entirely at your own 
-risk.  If it formats your entire computer, then that is your problem.  So please 
-make sure you have a recent backup before using it.
+* Added the `formatdisk.pl` script.
 
 
 Installation
 ------------
 
-Mount the GLIM partition (and the GLIMISO partition if present) on your USB 
-memory stick (or external hard drive).
+* Run `./formatdisk.pl`. It will ask you which block device (disk / USB stick)
+you want to use and will create the necessary partitions and filesystems.
 
-Then clone the git repository (or use Code > Download ZIP before unzipping it), 
-and just run the script (as a normal user) :
-```
-./glim.sh
-```
-Once finished, you may change the filesystem label to anything you like. 
-The script will have created an `iso` folder, inside of which you will see an 
-empty folder for each supported Linux distro.
+* It will now have 3 partitions. Mount the first 2 partitions somewhere.
+(Doesn't matter where)
 
-The supported `iso` sub-directories (in alphabetical order) are :
+* Run `./glim.sh` to actually install all necessary files
+
+* Copy your iso files to the appropriate sub-directories in the `iso` folder.
+Below are the `iso` sub-directories.
+(note that unless mentioned they haven't been tested in this glim fork)
 
 [//]: # (distro-list-start)
 
@@ -136,6 +81,7 @@ The supported `iso` sub-directories (in alphabetical order) are :
 * [`memtest`](https://memtest.org/) - _Only .bin/.efi, not .iso_
 * [`mxlinux`](https://mxlinux.org/)
 * [`netrunner`](https://www.netrunner.com/)
+* [`nixos`](https://nixos.org/)
 * [`openbsd`](https://www.openbsd.org/)
 * [`opensuse`](https://www.opensuse.org/) - _Live from Alternative Downloads only_
 * [`peppermint`](https://peppermintos.com/)
@@ -216,29 +162,6 @@ as /STORAGE.
 The `.iso` file doesn't work. Use either the `.bin` or the `.efi` depending on
 the boot mode used.
 
-### Ubuntu
-
-Recent Ubuntu desktop iso images bundle multiple versions on the Nvidia
-driver. With that, the images are over 4GB, the FAT32 max file size. For example
-`ubuntu-20.04.6-desktop-amd64.iso` is 4.1GB, `ubuntu-22.04.2-desktop-amd64.iso`
-is 4.6GB. The driver is not required in a live system, it can be removed to make
-an image fit into 4GB. For example, with 22.04.2 image in the current dir:
-
-```
-mkdir slim
-iso=ubuntu-22.04.2-desktop-amd64.iso
-
-xorriso -indev "$iso" -outdev slim/"$iso" \
-    -boot_image any replay -rm_r /pool/restricted/{l,n} --
-```
-
-Now you can copy `slim/ubuntu-22.04.2-desktop-amd64.iso` to your FAT32 formatted
-GLIM USB stick.
-
-Some Ubuntu flavours also bundle the Nvidia driver (like Kubuntu), some don't
-(like Xubuntu). The same trick can be used with the former.
-
-
 Testing
 -------
 
@@ -251,22 +174,12 @@ For UEFI testing, you'll need to use one of the `/usr/share/edk2/ovmf/*.fd`
 firmwares.
 
 
-Troubleshooting
----------------
-
-If you have any problem to boot, for instance stuck at the GRUB prompt before
-the menu, try re-installing.
-If you have other exotic GRUB errors, such as garbage text read instead of the
-configuration directives, try re-formatting your USB memory from scratch.
-I've seen weird things happen...
-
-
 Contributing
 ------------
 
 If you find GLIM useful but the configuration of the OS you require is missing
 or simply outdated, please feel free to contribute! What you will need is to
-create a GitHub pull request which includes :
+create a GitHub pull request to the original repo of thias which includes :
  * All changes properly and fully tested.
  * New entries added similarly to the existing ones :
    * In alphabetical order.
@@ -275,6 +188,7 @@ create a GitHub pull request which includes :
    `convert -size 24x24 -background 'rgba(0,0,0,0)' original.svg small.png`
    may work.
  * An updated supported directories list in this README file.
+Pull requests for the actual code or this README can be send to this repo.
 
 Credits
 -------
@@ -284,7 +198,7 @@ Credits
 * Copyleft 2025 Eugene Sanivsky (eugenesan) https://github.com/eugenesan
 
 All configuration files included are public domain. Do what you want with them.
-The invader logo was made by me, so unless the exact shape is covered by
+The invader logo was made by Matthias, so unless the exact shape is covered by
 copyright somewhere, do what you want with it.
 The background is "Wallpaper grey" © 2008 payalnic (DeviantArt)
 The `ascii.pf2` font comes from GRUB, which is GPLv3+ licensed. For more
