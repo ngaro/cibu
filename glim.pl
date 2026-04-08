@@ -119,7 +119,7 @@ sub mount {
     my $mounts= {};
     say "Mounting the following partitions: @partitions";
     foreach my $part (@partitions) {
-      my $dir = `mktemp -d`; chomp($dir);
+      my $dir = `mktemp -d /tmp/GLIM-mnt-XXXXXX`; chomp($dir);
       myerror "Failed to create temporary directory for mounting $part" if $? != 0;
       say "Mounting $part on temporary directory $dir";
       mysystem("mount $part $dir");
@@ -188,7 +188,7 @@ my $usbdev = '/dev/sdb'; #TODO receive this from the previous script
 showdisclaimer();
 ask_for_confirmation("If you have read, understood & fully accepted the above, then please enter 'yes' otherwise enter 'no' to cancel: ");
 check_root();
-say ""; check_available_programs(qw(mount mktemp rsync mount umount mkdir));
+say ""; check_available_programs(qw(mount mktemp rsync mount umount mkdir chown));
 say ""; my $grubversion = grub_grub2_choice();
 say ""; my $grubconfigdir = find_and_check_grub_dir();
 my $part1 = $usbdev . '1';
@@ -199,3 +199,6 @@ say ""; my $support = check_bios_efi_support();
 say ""; install_grub($grubversion->{installer}, $support, $mounts->{$part1}, $usbdev);
 say ""; copy_grub_config($grubconfigdir, "$mounts->{$part1}/boot/$grubversion->{configdir}");
 say ""; create_iso_dirs($mounts->{$part2}, $grubconfigdir, $wanteduid, $wantedgid);
+say ""; umount($part1, $part2);
+say ""; mystem("rm -rf '$mounts->{$part1}' '$mounts->{$part2}'");
+say "All done ! You can now copy your ISO files to the 'iso' directory on the second partition of the USB device and boot from it to use GLIM.";
