@@ -82,15 +82,27 @@ sub find_and_check_grub_dir {
     myerror "grub.cfg not found.";
 }
 
+sub find_part1 {
+  say "Looking for partition with label 'GLIM'...";
+  my $part1 = `blkid -l -o device -t LABEL=GLIM 2>/dev/null`;
+  if($? != 0 || $part1 =~ /^\s*$/) {
+    myerror "No partition found with label 'GLIM'. Please create one.";
+  }
+  my @parts = split("\n", $part1);
+  if(@parts > 1) {
+    myerror "Multiple partitions found with label 'GLIM'. Please disconnect/rename the unwanted ones.";
+  }
+  chomp($part1);
+  say "Found partition with label 'GLIM': $part1";
+}
+
 showdisclaimer();
 ask_for_confirmation("If you have read, understood & fully accepted the above, then please enter 'yes' otherwise enter 'no' to cancel: ");
 check_root();
 check_available_programs(qw(blkid));
 my $grub = grub_grub2_choice();
 my $GRUB2_CONF = find_and_check_grub_dir();
-my $USBDEV1 = `blkid -l -o device -t LABEL=GLIM`; #TODO handle multiple partitions with label GLIM
-myerror "no partition found with label 'GLIM'." if $USBDEV1=~ /^\s*$/;
-say "Found partition with label 'GLIM' : $USBDEV1";
+my $USBDEV1 = find_part1();
 exit(0); #TODO continue with the rest of the script, which is still in bash below
 
 =pod
