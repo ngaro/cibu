@@ -119,7 +119,7 @@ sub mount {
     my $mounts= {};
     say "Mounting the following partitions: @partitions";
     foreach my $part (@partitions) {
-      my $dir = `mktemp -d`;
+      my $dir = `mktemp -d`; chomp($dir);
       myerror "Failed to create temporary directory for mounting $part" if $? != 0;
       say "Mounting $part on temporary directory $dir";
       mysystem("mount $part $dir");
