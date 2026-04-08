@@ -88,8 +88,8 @@ sub find_and_check_grub_dir {
 }
 
 sub umount {
-    my @devices = @_;
-    say "Checking if any of the following devices are mounted and unmounting them if they are: @devices";
+    my @partitions = @_;
+    say "Checking if any of the following partitions are mounted and unmounting them if they are: @partitions";
     my $mountoutput = `mount`;
     if($? != 0) {
       myerror "Failed to get mount output.";
@@ -104,27 +104,27 @@ sub umount {
         }
       }
     }
-    foreach my $dev (@devices) {
-      if(exists $mounts->{$dev}) {
-        foreach my $mnt (@{$mounts->{$dev}}) {
-          say "Unmounting $dev from $mnt";
-          mysystem("umount", $mnt);
+    foreach my $part (@partitions) {
+      if(exists $mounts->{$part}) {
+        foreach my $mnt (@{$mounts->{$part}}) {
+          say "Unmounting $part from $mnt";
+          mysystem("umount $mnt");
         }
       }
     }
-    say "All specified devices have been unmounted if they were mounted.";
+    say "All specified partitions are now unmounted.";
 }
 
 sub mount {
-    my @devices = @_;
+    my @partitions = @_;
     my $mounts= {};
-    say "Mounting devices: @devices";
-    foreach my $dev (@devices) {
+    say "Mounting the following partitions: @partitions";
+    foreach my $part (@partitions) {
       my $dir = `mktemp -d`;
-      myerror "Failed to create temporary directory for mounting $dev" if $? != 0;
-      say "Mounting $dev on temporary directory $dir";
-      mysystem("mount $dev $dir");
-      $mounts->{$dev} = $dir;
+      myerror "Failed to create temporary directory for mounting $part" if $? != 0;
+      say "Mounting $part on temporary directory $dir";
+      mysystem("mount $part $dir");
+      $mounts->{$part} = $dir;
     }
 }
 
