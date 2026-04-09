@@ -70,6 +70,7 @@ sub run_as_root {
 sub find_available_block_devices {
     my @blockdevices = `lsblk -o name -pn --nodeps`;
     chomp @blockdevices;
+    @blockdevices = grep { !/\/sr\d+$/ } @blockdevices; #Filter out CD-ROM drives
     return \@blockdevices;
 }
 
