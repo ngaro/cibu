@@ -33,9 +33,7 @@ sub showdisclaimer {
 
 This script will format a chosen empty block device (USB-stick, disk, ...) or disk image file with GLIM's recommended set-up.
 Although I've tried to be careful, a bug could potentially wipe your whole computer !  So make sure you have a recent backup before executing this script !
-Please read the 'README.md' documentation before using this script.
-
-THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+Read the documentation in 'README.md' and the license in 'LICENSE' before running this script.
 
 END
 }
@@ -325,7 +323,7 @@ sub create_iso_dirs {
 
 #Preparation/checks
 showdisclaimer();
-ask_for_confirmation("If you have read, understood & fully accepted the above, then please enter 'yes' otherwise enter 'no' to cancel: ");
+ask_for_confirmation("If you have read, understood & fully accepted the license and the rest of the text above, then please enter 'yes'. Otherwise enter 'no' to cancel: ");
 my $user = find_sudo_user();
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 #Formatting and setting up the device
