@@ -84,7 +84,8 @@ Choose the number of a blockdevice to overwrite. Choose option 0 to cancel.
 You can also enter the full path. This will be useful IN THE FUTURE if you want to create a disk image file instead of a physical block device.
 (Disk images is a feature that is not yet implemented)
 END
-    for(my $i=0; $i<@options; $i++) {
+    my $i;
+    for($i=0; $i<@options; $i++) {
       say "[$i] $options[$i]";
     }
     say "[$i] Show detailed info of all block devices above first";
@@ -93,7 +94,7 @@ END
         say "Script cancelled by user."; exit(1);
     if($answer =~ /^\s*$i\s*$/) {
         for(my $j=1; $j<$i; $j++) {
-          say "### Detailed info for $options[$j] ###";
+          say "Detailed info for $options[$j]:";
           mysystem("fdisk -l $options[$j]");
           say "";
         }
