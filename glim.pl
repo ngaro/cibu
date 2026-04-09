@@ -92,7 +92,7 @@ END
     print "Choose a optionnumber or enter a path: "; my $answer = <STDIN>; chomp $answer;
     if($answer =~ /^\s*0\s*$/) {
         say "Script cancelled by user."; exit(1);
-    if($answer =~ /^\s*$i\s*$/) {
+    } elsif($answer =~ /^\s*$i\s*$/) {
         for(my $j=1; $j<$i; $j++) {
           say "Detailed info for $options[$j]:";
           mysystem("fdisk -l $options[$j]");
