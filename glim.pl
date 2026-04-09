@@ -192,8 +192,8 @@ sub name_and_format_partitions {
     mysystem("sgdisk --change-name=3:'BIOS Boot' $device");
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
     say "Naming the partions on '$device' is done. Now formatting the partitions...";
-    mysystem("mkfs.fat -F 32 -n GLIM ${device}1"); # Format the first partition as FAT32, and set its label to 'GLIM'
-    mysystem("mkfs.ext4 -L GLIMISO ${device}2"); # Format the second partition as ext4, and set its label to 'GLIMISO'
+    mysystem("mkfs.fat -I -F 32 -n GLIM ${device}1"); # Format the first partition as FAT32, and set its label to 'GLIM'
+    mysystem("mkfs.ext4 -F -L GLIMISO ${device}2"); # Format the second partition as ext4, and set its label to 'GLIMISO'
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
     say "The partitions on '$device' have been named and formatted.";
 }
