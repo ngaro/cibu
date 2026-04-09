@@ -8,8 +8,7 @@ Overview
 --------
 
 GLIM is a tool to create a boot medium _(usually a USB stick)_ that can boot 
-multiple ISO images from different operating systems.<br>
-This is meant for everyone who doesn't want to carry around
+multiple ISO images from different operating systems. This is meant for everyone who doesn't want to carry around
 a different USB stick for every iso they want to boot from.
 
 If you found this repo, you probably already found [Ventoy](https://www.ventoy.net/en/index.html) too.<br>
@@ -22,8 +21,8 @@ The only blobs inside are the images _(which you can replace if you want)_.
 Screenshots
 -----------
 _The screenshots are from the original repo; screenshots of my fork are 99% identical. The difference: The link at the bottom points to my repo._
-![Main Menu](https://github.com/ngaro/glim/raw/master/screenshots/GLIM-3.0-shot1.png)
-![Ubuntu Submenu](https://github.com/ngaro/glim/raw/master/screenshots/GLIM-3.0-shot2.png)
+![Main Menu](https://github.com/ngaro/glim/raw/perl/screenshots/GLIM-3.0-shot1.png)
+![Ubuntu Submenu](https://github.com/ngaro/glim/raw/perl/screenshots/GLIM-3.0-shot2.png)
 
 
 Differences from the original [GLIM (from thias)](https://github.com/thias/glim)
