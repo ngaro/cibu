@@ -20,7 +20,8 @@ The only blobs inside are the images _(which you can replace if you want)_.
 
 Screenshots
 -----------
-_The screenshots are from the original repo; screenshots of my fork are 99% identical. The difference: The link at the bottom points to my repo._
+_The screenshots are from the original repo; screenshots of my fork are 99% identical.<br>The difference: The link at the bottom points to my repo._
+
 ![Main Menu](https://github.com/ngaro/glim/raw/perl/screenshots/GLIM-3.0-shot1.png)
 ![Ubuntu Submenu](https://github.com/ngaro/glim/raw/perl/screenshots/GLIM-3.0-shot2.png)
 
