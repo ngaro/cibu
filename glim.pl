@@ -54,7 +54,7 @@ sub ask_for_confirmation {
 
 #Checks if the script is ran with a sudo to root, and if so, returns a hash with the uid and gid of the user who invoked sudo. If not, prints an error message and exits with code 1.
 sub find_sudo_user {
-    $user = {};
+    my $user = {};
     if(exists $ENV{SUDO_USER} && exists $ENV{SUDO_UID} && exists $ENV{SUDO_GID} && $> == 0) {
         $user->{uid} = $ENV{SUDO_UID};  #SUDO_UID is the UID of the user who invoked sudo
         $user->{gid} = $ENV{SUDO_GID};  #SUDO_GID is the GID of the user who invoked sudo
@@ -173,8 +173,8 @@ sub name_and_format_partitions {
     mysystem("sgdisk --change-name=3:'BIOS Boot' $device");
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
     say "Naming the partions on '$device' is done. Now formatting the partitions...";
-    mysystem("mkfs.fat -F 32 -n GLIM ${disk}1"); # Format the first partition as FAT32, and set its label to 'GLIM'
-    mysystem("mkfs.ext4 -L GLIMISO ${disk}2"); # Format the second partition as ext4, and set its label to 'GLIMISO'
+    mysystem("mkfs.fat -F 32 -n GLIM ${device}1"); # Format the first partition as FAT32, and set its label to 'GLIM'
+    mysystem("mkfs.ext4 -L GLIMISO ${device}2"); # Format the second partition as ext4, and set its label to 'GLIMISO'
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
     say "The partitions on '$device' have been named and formatted.";
 }
