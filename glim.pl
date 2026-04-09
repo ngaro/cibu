@@ -50,15 +50,18 @@ sub ask_for_confirmation {
     }
 }
 
-#Checks if the script is ran with a sudo to root, and if so, returns a hash with the uid and gid of the user who invoked sudo. If not, prints an error message and exits with code 1.
-sub find_sudo_user {
+#Returns a hash with the uid and gid of the user starting the script. If the original user is root quit with return code 1
+#If the user is not root at this point in time restart this script but run it with sudo to give it all necessary permissions
+sub run_as_root {
     my $user = {};
-    if(exists $ENV{SUDO_USER} && exists $ENV{SUDO_UID} && exists $ENV{SUDO_GID} && $> == 0) {
+    if($> == 0 and not exists $ENV{SUDO_USER}) {
+        myerror "This script should not be run as root. Run it as a normal user. It will use sudo to become root."
+    }
+    if(exists $ENV{SUDO_USER} && exists $ENV{SUDO_UID} && exists $ENV{SUDO_GID}) {
         $user->{uid} = $ENV{SUDO_UID};  #SUDO_UID is the UID of the user who invoked sudo
         $user->{gid} = $ENV{SUDO_GID};  #SUDO_GID is the GID of the user who invoked sudo
-        say "Running with sudo, started by user '$user->{name}' (uid: $user->{uid}, gid: $user->{gid})";
     } else {
-        myerror "This script must be run with sudo. Please run it with 'sudo' and try again.";
+        exec('sudo', '-E', $0, @ARGV) or myerror "Failed to re-run the script with sudo. Please run the script as a normal user and make sure you have sudo installed and configured correctly.";
     }
     return $user;
 }
@@ -324,7 +327,7 @@ sub create_iso_dirs {
 #Preparation/checks
 showdisclaimer();
 ask_for_confirmation("If you have read, understood & fully accepted the license and the rest of the text above, then please enter 'yes'. Otherwise enter 'no' to cancel: ");
-my $user = find_sudo_user();
+my $user = run_as_root();
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 #Formatting and setting up the device
 say ""; my $device = choose_device();
