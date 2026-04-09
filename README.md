@@ -193,14 +193,11 @@ Pull requests for the actual code or this README can be send to this repo.
 Credits
 -------
 
-* Copyleft 2012-2023 Matthias Saou http://matthias.saou.eu/
-* Copyleft 2025 Chris Handley https://github.com/cshandley-uk
-* Copyleft 2025 Eugene Sanivsky (eugenesan) https://github.com/eugenesan
+* Matthias Saou http://matthias.saou.eu/
+* Chris Handley https://github.com/cshandley-uk
+* Eugene Sanivsky (eugenesan) https://github.com/eugenesan
+* Nikolas Garofil https://github.com/ngaro
 
-All configuration files included are public domain. Do what you want with them.
-The invader logo was made by Matthias, so unless the exact shape is covered by
-copyright somewhere, do what you want with it.
-The background is "Wallpaper grey" © 2008 payalnic (DeviantArt)
-The `ascii.pf2` font comes from GRUB, which is GPLv3+ licensed. For more
-details as well as the source code, see http://www.gnu.org/software/grub/
-
+In this version of GLIM all files except 'grub2/themes/invader/background.png'
+are licensed under GPLv3. See the LICENSE file for more details.
+'grub2/themes/invader/background.png' is © 2008 payalnic (DeviantArt)
