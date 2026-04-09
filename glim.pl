@@ -5,6 +5,7 @@ use FindBin;
 #Prints an error message passed as an argument and exit with code 1
 sub myerror {
   say "ERROR: @_";
+  say "Depending on where in the script this error happened, you might want to umount newly created partitions and remove their mountpoints (which should be in /tmp and start with 'GLIM-mnt-')";
   exit(1);
 }
 
@@ -342,6 +343,9 @@ sub create_iso_dirs {
   say "Directory layout for ISO files created.";
 }
 
+
+my $grubpartsize = '100M'; #The size of the first partition on the device, which will be used for GLIM and to install GRUB on. The rest of the space on the device (except for the 1MB at the end for the BIOS Boot partition) will be used for the second partition, which is where the ISO files can be stored.
+
 #Preparation/checks
 my $user = run_as_root();
 showdisclaimer();
@@ -352,20 +356,20 @@ say ""; my $device = choose_device();
 say ""; check_if_mounted($device);
 say ""; deviceinfo_and_confirmation($device);
 say ""; wipe_and_create_table($device);
-say ""; create_partitions($device, '100M');
+say ""; create_partitions($device, $grubpartsize);
 say ""; name_and_format_partitions($device);
 #Installing GLIM
 say ""; my $grubversion = grub_grub2_choice();
 say ""; my $grubconfigdir = find_and_check_grub_dir();
-my $part1 = $device . '1';
-my $part2 = $device . '2';
-say ""; umount($part1, $part2);
-say ""; my $mounts = mount($part1, $part2);
+my $grubpart = $device . '1';
+my $isopart = $device . '2';
+say ""; umount($grubpart, $isopart); #Just in case they are automounted
+say ""; my $mounts = mount($grubpart, $isopart);
 say ""; my $support = check_bios_efi_support();
-say ""; install_grub($grubversion->{installer}, $support, $mounts->{$part1}, $device);
-say ""; copy_grub_config($grubconfigdir, "$mounts->{$part1}/boot/$grubversion->{configdir}");
-say ""; create_iso_dirs($mounts->{$part2}, $grubconfigdir, $user);
+say ""; install_grub($grubversion->{installer}, $support, $mounts->{$grubpart}, $device);
+say ""; copy_grub_config($grubconfigdir, "$mounts->{$grubpart}/boot/$grubversion->{configdir}");
+say ""; create_iso_dirs($mounts->{$isopart}, $grubconfigdir, $user);
 #Finishing up
-say ""; umount($part1, $part2);
-say ""; mysystem("rm -rf '$mounts->{$part1}' '$mounts->{$part2}'");
+say ""; umount($grubpart, $isopart);
+say ""; mysystem("rm -rf '$mounts->{$grubpart}' '$mounts->{$isopart}'");
 say "All done ! You can now copy your ISO files to the 'iso' directory on the second partition of the device and boot from it to use GLIM.";
