@@ -1,26 +1,24 @@
 #!/usr/bin/env perl
-#This script used to be bash, we keep it in a PoD to refer to it later.
-#PoD's starting with '### REWRITTEN ###' are already rewritten in perl below.
-#PoD's starting with '### TO REWRITE ###' are still in bash, and need to be rewritten in perl.
-
 use strict; use warnings; use v5.30;
 use FindBin;
 
+#Prints an error message passed as an argument and exit with code 1
 sub myerror {
   say "ERROR: @_";
   exit(1);
 }
 
+#Runs a system command passed as an argument, and print it before running it. If the command fails (exit code != 0), mentions it in an error message and exits with code 1.
 sub mysystem {
   say "Running: @_";
   system(@_) == 0 or myerror "Command '@_' failed with exit code $?";
 }
 
+#Checks if the programs passed as arguments are available in the system's $PATH. If a program is not found, prints an error message and exit with code 1.
 sub check_available_programs {
   say "Checking for required programs...";
   foreach(@_) {
     my $path = `which $_ 2>/dev/null`;
-    #If the output the return code is 0 and the output is a path print it
     if($? == 0 && $path =~ /^\/.*$_$/) {
       print "Found required program '$_' at path: $path";
     } else {
@@ -42,6 +40,7 @@ THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND 
 END
 }
 
+#Asks the user for confirmation to continue. Exits the script with return code 1 if the user doesn't enter 'y' or 'yes'. If an argument is passed then this will be the question instead of the default one.
 sub ask_for_confirmation {
     my $defaultmessage = "Enter 'yes' to confirm or 'no' to cancel: ";
     my $message = $defaultmessage;
@@ -53,12 +52,136 @@ sub ask_for_confirmation {
     }
 }
 
-sub check_root {
-  if($> != 0) {
-      myerror "This script must be run as root. Please run it with 'sudo' or as root user.";
-  }
+#Checks if the script is ran with a sudo to root, and if so, returns a hash with the uid and gid of the user who invoked sudo. If not, prints an error message and exits with code 1.
+sub find_sudo_user {
+    $user = {};
+    if(exists $ENV{SUDO_USER} && exists $ENV{SUDO_UID} && exists $ENV{SUDO_GID} && $> == 0) {
+        $user->{uid} = $ENV{SUDO_UID};  #SUDO_UID is the UID of the user who invoked sudo
+        $user->{gid} = $ENV{SUDO_GID};  #SUDO_GID is the GID of the user who invoked sudo
+        say "Running with sudo, started by user '$user->{name}' (uid: $user->{uid}, gid: $user->{gid})";
+    } else {
+        myerror "This script must be run with sudo. Please run it with 'sudo' and try again.";
+    }
+    return $user;
 }
 
+#Finds the available block devices and return them as a list. Blockdevices that are partitions of other blockdevices will not be included in the list.
+sub find_available_block_devices {
+    my @blockdevices = `lsblk -o name -pn --nodeps`;
+    chomp @blockdevices;
+    return \@blockdevices;
+}
+
+#Asks the user to choose a block device from a list of available block devices or to enter a path to a block device. Returns the chosen block device.
+#If the user enters 0 or a path that is not a block device the script will be cancelled with an error message.
+#When we implement the option to create a disk image file in the future, the check for a block device will be removed
+sub choose_device {
+    my @options = ("Cancel", @{find_available_block_devices()});
+    print << 'END';
+Choose the number of a blockdevice to overwrite. Choose option 0 to cancel.
+You can also enter the full path. This will be useful IN THE FUTURE if you want to create a disk image file instead of a physical block device.
+(Disk images is a feature that is not yet implemented)
+END
+    for(my $i=0; $i<@options; $i++) {
+      say "[$i] $options[$i]";
+    }
+    print "Choose a optionnumber or enter a path: "; my $answer = <STDIN>; chomp $answer;
+    if($answer =~ /^\s*0\s*$/) {
+        say "Script cancelled by user."; exit(1);
+    } elsif($answer =~ /^\s*(\d+)\s*$/ && exists $options[$1]) {
+        return $options[$1];
+    } elsif($answer =~ /^\s*(\S.*?)\s*$/ && -b $1) {
+        return $1;
+    } else {
+        myerror "Invalid input. Please enter a valid number or path to a (existing) file or block device.";
+    }
+}
+
+#Checks if any of the partitions on the given device are mounted. If a mounted partition is found, prints an error message and exits with code 1.
+sub check_if_mounted {
+    my $device = shift;
+    say "Checking if any partitions on '$device' are mounted...";
+    my @partitions = `lsblk -o mountpoint -n $device`;
+    foreach(@partitions) {
+        chomp;
+        myerror "$device has one or more partitions that are still mounted. (I already found a partition mounted at '$_').\nPlease unmount all partitions on the device before running this script." unless $_ =~ /^\s*$/;
+    }
+    say "No partitions on '$device' are mounted.";
+}
+
+#Prints some information about the given device, and asks the user to confirm that they want to continue with this device. If the user doesn't confirm, the script will be cancelled with an error message.
+sub deviceinfo_and_confirmation {
+    my $device = shift;
+    say "You have chosen to overwrite '$device'. Here is some more info about it (found with 'fdisk -l $device'):";
+    system("fdisk -l $device");
+    ask_for_confirmation("\nIf you are sure you have chosen the correct device, then please enter 'yes' to confirm and continue, otherwise enter 'no' to cancel: ");
+}
+
+#Finds the partitions on the given device and returns them as a list.
+sub find_partitions_on_device {
+    my $device = shift;
+    my $fdisk_output = `fdisk -l $device`;
+    my @partitions;
+    foreach(split("\n", $fdisk_output)) {
+        if(/^\s*($device\d+)\s+/) {
+            push @partitions, $1;
+        }
+    }
+    return \@partitions;
+}
+
+#Wipes the filesystem signatures of the partitions on the given devices, wipes the partition table and creates a new GPT partition table
+sub wipe_and_create_table {
+    my $device = shift;
+    my $partitions = find_partitions_on_device($device);
+    say "Wiping '$device' and creating a new GPT partition table on it...";
+    foreach(@$partitions) {
+        mysystem("dd if=/dev/zero of=$_ bs=512 count=1024 conv=fsync"); #Wipe the first 512k of each partition, to make sure the old filesystem is gone.
+    }
+    mysystem("sgdisk --zap-all $device"); #Wipe the partition table
+    mysystem("sgdisk --mbrtogpt $device"); #Create a new GPT partition table
+    mysystem("partprobe $device && sleep 3"); # Tell the OS about the new partition table
+    say "$device has been wiped and a new GPT partition table has been created on it.";
+}
+
+#Creates 3 partitions on the device gives as 1st argument. The partitions are created in the following way:
+## 1st partition -> Will have a size of the 2nd argument passed to the function
+## 2nd partition -> Will use the remaining space on the device after creating the 1st and 3rd partition
+## 3rd partition -> Will be 1MB in size, at the end of the device and will get the GUID and typecode to indicate that it is a BIOS Boot partition.
+sub create_partitions {
+    my ($device, $glim_size) = @_;
+    say "Creating the 3 partitions on '$device' needed by GLIM.";
+    say "The 1st partition will be used for GLIM and will have a size of $glim_size, the 2nd partition for the iso files and the 3rd partition will be used as the BIOS Boot partition by GRUB.";
+    mysystem("sgdisk --new=1:0:+$glim_size $device"); # Create the first partition, starting at the beginning of the device, and using the specified size
+    mysystem("sgdisk --new=3:-1M:0 --typecode=3:ef02 --partition-guid=3:21686148-6449-6E6F-744E-656564454649 $device"); # Create the third partition, starting at the end of the device
+    #The 3rd partition will be used as the BIOS Boot partition by GRUB, so we have to make sure that it is 1MB, uses 21686148-6449-6E6F-744E-656564454649 as special GUID and typecode ef02 to indicate this
+    mysystem("sgdisk --new=2:0:0 $device"); # Create the second partition, using the remaining space on the device
+    mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partitions
+    say "The 3 partitions needed by GLIM have been created on '$device'.";
+}
+
+#Names and formats the partitions on the given device. It expects that there are 3 partitions on the device. This are the filesystems and labels that will be used for the partitions:
+# 1st partition -> Will be named 'GLIM' and formatted as FAT32
+# 2nd partition -> Will be named 'GLIMISO' and formatted as ext4
+# 3rd partition -> Will be named 'BIOS Boot' and will not be formatted
+sub name_and_format_partitions {
+    my $device = shift;
+    say "Naming and formatting the partitions on '$device'.";
+    say "The first partition will be named 'GLIM' and formatted as FAT32, the second partition will be named 'GLIMISO' and formatted as ext4, and the third partition will be named 'BIOS Boot' and left unformatted.";
+    mysystem("sgdisk --change-name=1:GLIM $device");
+    mysystem("sgdisk --change-name=2:GLIMISO $device");
+    mysystem("sgdisk --change-name=3:'BIOS Boot' $device");
+    mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
+    say "Naming the partions on '$device' is done. Now formatting the partitions...";
+    mysystem("mkfs.fat -F 32 -n GLIM ${disk}1"); # Format the first partition as FAT32, and set its label to 'GLIM'
+    mysystem("mkfs.ext4 -L GLIMISO ${disk}2"); # Format the second partition as ext4, and set its label to 'GLIMISO'
+    mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
+    say "The partitions on '$device' have been named and formatted.";
+}
+
+#Checks if grub2-install or grub-install is available on the system, and returns a hash with a key 'installer' with this command as value.
+#This hash also has a key 'configdir' that has the name of the grub config directory of the grub on your system as value (not the full path, only the ending which should be 'grub2' or 'grub').
+#If neither grub2-install nor grub-install is found, prints an error message and exits with code 1.
 sub grub_grub2_choice {
     say "Checking for grub or grub2";
     my $grubversion = {};
@@ -80,12 +203,14 @@ sub grub_grub2_choice {
     return $grubversion;
 }
 
+#Returns the absolute to the grub2 config directory which should be located in the same directory as this script. Prints an error message and exits with code 1 if the grub2 config directory or the grub.cfg file inside it is not found.
 sub find_and_check_grub_dir {
     my $grubconfigdir = $FindBin::Bin . '/grub2';
     return $grubconfigdir if -d $grubconfigdir && -f "$grubconfigdir/grub.cfg";
     myerror "grub.cfg not found.";
 }
 
+#Unmounts the partitions passed as arguments if they are mounted. If a partition is not mounted, it will be skipped. If a partition is mounted multiple times, they will all be unmounted.
 sub umount {
     my @partitions = @_;
     say "Checking if any of the following partitions are mounted and unmounting them if they are: @partitions";
@@ -114,6 +239,7 @@ sub umount {
     say "All specified partitions are now unmounted.";
 }
 
+#Mounts the partitions passed as arguments on temporary directories. Returns a hash with the partition as key and the temporary directory it is mounted on as value.
 sub mount {
     my @partitions = @_;
     my $mounts= {};
@@ -129,6 +255,8 @@ sub mount {
     return $mounts;
 }
 
+#Checks if the grub on the system has support for BIOS and/or EFI boot mode by checking if the directories /usr/lib/grub/i386-pc and /usr/lib/grub/x86_64-efi exist.
+#Returns a hash with keys 'BIOS' and 'EFI' with value 1 if support for that boot mode is found. If no support for either boot mode is found, prints an error message and exits with code 1.
 sub check_bios_efi_support {
   my $support = {};
   $support->{BIOS} = 1 if( -d '/usr/lib/grub/i386-pc');
@@ -149,56 +277,76 @@ sub check_bios_efi_support {
   return $support;
 }
 
+#Installs GRUB on the given device and partition, for the boot modes supported by the grub on the system.
+#1st argument is the grub installer command to use (grub-install or grub2-install),
+#2nd argument is the hash with the supported boot modes returned by the check_bios_efi_support function
+#3rd argument is the mountpoint of the first partition on which the boot files will be installed
+#4th argument is the device on which to install grub
 sub install_grub {
-  my ($grubinstaller, $support, $part1mountpoint, $usbdev) = @_;
+  my ($grubinstaller, $support, $part1mountpoint, $device) = @_;
   if(exists $support->{BIOS}) {
     say "Installing GRUB for BIOS boot mode...";
-    mysystem("$grubinstaller --target=i386-pc --boot-directory '$part1mountpoint/boot' $usbdev");
+    mysystem("$grubinstaller --target=i386-pc --boot-directory '$part1mountpoint/boot' $device");
     say "GRUB installed for BIOS boot mode.";
   }
   if(exists $support->{EFI}) {
     say "Installing GRUB for EFI boot mode...";
-    mysystem("$grubinstaller --target=x86_64-efi --removable --no-nvram --efi-directory '$part1mountpoint' --boot-directory '$part1mountpoint/boot' $usbdev");
+    mysystem("$grubinstaller --target=x86_64-efi --removable --no-nvram --efi-directory '$part1mountpoint' --boot-directory '$part1mountpoint/boot' $device");
     say "GRUB installed for EFI boot mode.";
   }
 }
 
+#Copies the GRUB configuration files from the directory in the 1st argument to the directory in the 2nd argument. It is expected that:
+# - The from-directory should be the absolute path of the grub2 config directory that is located in the same directory as this script
+# - The to-directory is 'boot/grub' or 'boot/grub2' on the mounted first partition of the device, depending on the grub version found on the system. Also as absolute path.
 sub copy_grub_config {
   my ($fromdir, $todir) = @_;
-  say "Copying GRUB configuration to the USB device...";
+  say "Copying GRUB configuration to the device...";
   mysystem("rsync -rt --delete --exclude=i386-pc --exclude=x86_64-efi --exclude=fonts -- $fromdir/ $todir/");
   say "GRUB configuration copied.";
 }
 
+#Creates the directory layout for the ISO files. It is expected that:
+# - The 1st argument is the absolute path of the mounted second partition of the device
+# - The 2nd argument is the absolute path of the grub2 config directory that is located in the same directory as this script, which contains the distro config files that will be used to create the directories for the ISO files.
+#   The distro config files in the grub2 config directory should be named in the format 'inc-<distroname>.cfg'.
+# - The 3rd argument is a hash with the uid and gid of the user who invoked sudo
+# The result will be a directory named 'iso' with for each <distroname> a subdir. And they will all get the UID and GID of the user who invoked sudo.
 sub create_iso_dirs {
-  my ($isomnt, $grubconfigdir, $wanteduid, $wantedgid) = @_;
+  my ($isomnt, $grubconfigdir, $user) = @_;
   say "Creating the directory layout for the partition for ISO files...";
   for my $distroconfig (glob("$grubconfigdir/*")) {
     $distroconfig =~ /^.*\/inc-(\S+)\.cfg$/ or next;
     mysystem("mkdir -p '$isomnt/iso/$1'");
   }
-  mysystem("chown -R $wanteduid:$wantedgid '$isomnt/iso'");
+  mysystem("chown -R $user->{uid}:$user->{gid} '$isomnt/iso'");
   say "Directory layout for ISO files created.";
 }
 
-my $wanteduid = 1000;
-my $wantedgid = 1000;
-my $usbdev = '/dev/sdb'; #TODO receive this from the previous script
-
+#Preparation/checks
 showdisclaimer();
 ask_for_confirmation("If you have read, understood & fully accepted the above, then please enter 'yes' otherwise enter 'no' to cancel: ");
-check_root();
-say ""; check_available_programs(qw(mount mktemp rsync mount umount mkdir chown));
+my $user = find_sudo_user();
+say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
+#Formatting and setting up the device
+say ""; my $device = choose_device();
+say ""; check_if_mounted($device);
+say ""; deviceinfo_and_confirmation($device);
+say ""; wipe_and_create_table($device);
+say ""; create_partitions($device, '100M');
+say ""; name_and_format_partitions($device);
+#Installing GLIM
 say ""; my $grubversion = grub_grub2_choice();
 say ""; my $grubconfigdir = find_and_check_grub_dir();
-my $part1 = $usbdev . '1';
-my $part2 = $usbdev . '2';
+my $part1 = $device . '1';
+my $part2 = $device . '2';
 say ""; umount($part1, $part2);
 say ""; my $mounts = mount($part1, $part2);
 say ""; my $support = check_bios_efi_support();
-say ""; install_grub($grubversion->{installer}, $support, $mounts->{$part1}, $usbdev);
+say ""; install_grub($grubversion->{installer}, $support, $mounts->{$part1}, $device);
 say ""; copy_grub_config($grubconfigdir, "$mounts->{$part1}/boot/$grubversion->{configdir}");
-say ""; create_iso_dirs($mounts->{$part2}, $grubconfigdir, $wanteduid, $wantedgid);
+say ""; create_iso_dirs($mounts->{$part2}, $grubconfigdir, $user);
+#Finishing up
 say ""; umount($part1, $part2);
 say ""; mystem("rm -rf '$mounts->{$part1}' '$mounts->{$part2}'");
-say "All done ! You can now copy your ISO files to the 'iso' directory on the second partition of the USB device and boot from it to use GLIM.";
+say "All done ! You can now copy your ISO files to the 'iso' directory on the second partition of the device and boot from it to use GLIM.";
