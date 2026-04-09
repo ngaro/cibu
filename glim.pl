@@ -325,9 +325,9 @@ sub create_iso_dirs {
 }
 
 #Preparation/checks
+my $user = run_as_root();
 showdisclaimer();
 ask_for_confirmation("If you have read, understood & fully accepted the license and the rest of the text above, then please enter 'yes'. Otherwise enter 'no' to cancel: ");
-my $user = run_as_root();
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 #Formatting and setting up the device
 say ""; my $device = choose_device();
