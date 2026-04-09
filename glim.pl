@@ -367,5 +367,5 @@ say ""; copy_grub_config($grubconfigdir, "$mounts->{$part1}/boot/$grubversion->{
 say ""; create_iso_dirs($mounts->{$part2}, $grubconfigdir, $user);
 #Finishing up
 say ""; umount($part1, $part2);
-say ""; mysstem("rm -rf '$mounts->{$part1}' '$mounts->{$part2}'");
+say ""; mysystem("rm -rf '$mounts->{$part1}' '$mounts->{$part2}'");
 say "All done ! You can now copy your ISO files to the 'iso' directory on the second partition of the device and boot from it to use GLIM.";
