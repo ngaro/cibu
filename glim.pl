@@ -10,7 +10,7 @@ sub myerror {
 
 #Runs a system command passed as an argument, and print it before running it. If the command fails (exit code != 0), mentions it in an error message and exits with code 1.
 sub mysystem {
-  say "Running: @_";
+  say "### Running: '@_'";
   system(@_) == 0 or myerror "Command '@_' failed with exit code $?";
 }
 
