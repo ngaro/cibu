@@ -75,6 +75,7 @@ sub find_available_block_devices {
 
 #Asks the user to choose a block device from a list of available block devices or to enter a path to a block device. Returns the chosen block device.
 #If the user enters 0 or a path that is not a block device the script will be cancelled with an error message.
+#The last number will be used to show detailed info of all block devices and afterwards this function will be called again.
 #When we implement the option to create a disk image file in the future, the check for a block device will be removed
 sub choose_device {
     my @options = ("Cancel", @{find_available_block_devices()});
@@ -86,9 +87,17 @@ END
     for(my $i=0; $i<@options; $i++) {
       say "[$i] $options[$i]";
     }
+    say "[$i] Show detailed info of all block devices above first";
     print "Choose a optionnumber or enter a path: "; my $answer = <STDIN>; chomp $answer;
     if($answer =~ /^\s*0\s*$/) {
         say "Script cancelled by user."; exit(1);
+    if($answer =~ /^\s*$i\s*$/) {
+        for(my $j=1; $j<$i; $j++) {
+          say "### Detailed info for $options[$j] ###";
+          mysystem("fdisk -l $options[$j]");
+          say "";
+        }
+        return choose_device();
     } elsif($answer =~ /^\s*(\d+)\s*$/ && exists $options[$1]) {
         return $options[$1];
     } elsif($answer =~ /^\s*(\S.*?)\s*$/ && -b $1) {
