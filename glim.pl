@@ -116,7 +116,14 @@ sub check_if_mounted {
     my @partitions = `lsblk -o mountpoint -n $device`;
     foreach(@partitions) {
         chomp;
-        myerror "$device has one or more partitions that are still mounted. (I already found a partition mounted at '$_').\nPlease unmount all partitions on the device before running this script." unless $_ =~ /^\s*$/;
+        unless(/^\s*$/) {
+            myerror <<END;
+$device has one or more partitions that are still mounted. (I already found a partition mounted at '$_').
+Please unmount all partitions on the device before running this script.
+(At this point in the script I don't umount things myself for safety reasons.
+When the device get's new partitions later, I will do mounting and umounting myself)
+END
+        }
     }
     say "No partitions on '$device' are mounted.";
 }
