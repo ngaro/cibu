@@ -46,7 +46,7 @@ desktop-image: "background.png"
 }
 
 + label {
-  text = "GRUB2 Live ISO Multiboot - https://github.com/thias/glim/"
+  text = "GRUB2 Live ISO Multiboot - https://github.com/ngaro/glim/"
   color = "#FFF"
   align = "center"
   left = 0
