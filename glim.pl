@@ -361,8 +361,7 @@ say ""; name_and_format_partitions($device);
 #Installing GLIM
 say ""; my $grubversion = grub_grub2_choice();
 say ""; my $grubconfigdir = find_and_check_grub_dir();
-my $grubpart = $device . '1';
-my $isopart = $device . '2';
+my ($grubpart, $isopart) = @{find_partitions_on_device($device)}[0,1];
 say ""; umount($grubpart, $isopart); #Just in case they are automounted
 say ""; my $mounts = mount($grubpart, $isopart);
 say ""; my $support = check_bios_efi_support();
