@@ -373,4 +373,4 @@ say ""; create_isos_dirs($mounts->{$isopart}, $grubconfigdir, $user);
 #Finishing up
 say ""; umount($grubpart, $isopart);
 say ""; mysystem("rm -rf '$mounts->{$grubpart}' '$mounts->{$isopart}'");
-say "All done ! You can now copy your ISO files to the 'iso' directory on the second partition of the device and boot from it to use $name.";
+say "All done ! You can now copy your ISO files to the 'isos' directory on the second partition of the device and boot from it to use $name.";
