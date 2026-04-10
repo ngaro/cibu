@@ -2,10 +2,12 @@
 use strict; use warnings; use v5.30;
 use FindBin;
 
+my $name = "GLIM";
+
 #Prints an error message passed as an argument and exit with code 1
 sub myerror {
   say "ERROR: @_";
-  say "Depending on where in the script this error happened, you might want to umount newly created partitions and remove their mountpoints (which should be in /tmp and start with 'GLIM-mnt-')";
+  say "Depending on where in the script this error happened, you might want to umount newly created partitions and remove their mountpoints (which should be in /tmp and start with '$name-mnt-')";
   exit(1);
 }
 
@@ -30,9 +32,9 @@ sub check_available_programs {
 }
 
 sub showdisclaimer {
-    print << 'END';
+    print << "END";
 
-This script will format a chosen empty block device (USB-stick, disk, ...) or disk image file with GLIM's recommended set-up.
+This script will format a chosen empty block device (USB-stick, disk, ...) or disk image file with $name's recommended set-up.
 Although I've tried to be careful, a bug could potentially wipe your whole computer !  So make sure you have a recent backup before executing this script !
 Read the documentation in 'README.md' and the license in 'LICENSE' before running this script.
 
@@ -169,32 +171,32 @@ sub wipe_and_create_table {
 ## 2nd partition -> Will use the remaining space on the device after creating the 1st and 3rd partition
 ## 3rd partition -> Will be 1MB in size, at the end of the device and will get the GUID and typecode to indicate that it is a BIOS Boot partition.
 sub create_partitions {
-    my ($device, $glim_size) = @_;
-    say "Creating the 3 partitions on '$device' needed by GLIM.";
-    say "The 1st partition will be used for GLIM and will have a size of $glim_size, the 2nd partition for the iso files and the 3rd partition will be used as the BIOS Boot partition by GRUB.";
-    mysystem("sgdisk --new=1:0:+$glim_size $device"); # Create the first partition, starting at the beginning of the device, and using the specified size
+    my ($device, $grubpartsize) = @_;
+    say "Creating the 3 partitions on '$device' needed by $name.";
+    say "The 1st partition will be used for $name and will have a size of $grubpartsize, the 2nd partition for the iso files and the 3rd partition will be used as the BIOS Boot partition by GRUB.";
+    mysystem("sgdisk --new=1:0:+$grubpartsize $device"); # Create the first partition, starting at the beginning of the device, and using the specified size
     mysystem("sgdisk --new=3:-1M:0 --typecode=3:ef02 --partition-guid=3:21686148-6449-6E6F-744E-656564454649 $device"); # Create the third partition, starting at the end of the device
     #The 3rd partition will be used as the BIOS Boot partition by GRUB, so we have to make sure that it is 1MB, uses 21686148-6449-6E6F-744E-656564454649 as special GUID and typecode ef02 to indicate this
     mysystem("sgdisk --new=2:0:0 $device"); # Create the second partition, using the remaining space on the device
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partitions
-    say "The 3 partitions needed by GLIM have been created on '$device'.";
+    say "The 3 partitions needed by $name have been created on '$device'.";
 }
 
 #Names and formats the partitions on the given device. It expects that there are 3 partitions on the device. This are the filesystems and labels that will be used for the partitions:
-# 1st partition -> Will be named 'GLIM' and formatted as FAT32
-# 2nd partition -> Will be named 'GLIMISO' and formatted as ext4
+# 1st partition -> Will be named 'GRUB' and formatted as FAT32
+# 2nd partition -> Will be named 'ISO' and formatted as ext4
 # 3rd partition -> Will be named 'BIOS Boot' and will not be formatted
 sub name_and_format_partitions {
     my $device = shift;
     say "Naming and formatting the partitions on '$device'.";
-    say "The first partition will be named 'GLIM' and formatted as FAT32, the second partition will be named 'GLIMISO' and formatted as ext4, and the third partition will be named 'BIOS Boot' and left unformatted.";
-    mysystem("sgdisk --change-name=1:GLIM $device");
-    mysystem("sgdisk --change-name=2:GLIMISO $device");
+    say "The first partition will be named 'GRUB' and formatted as FAT32, the second partition will be named 'ISO' and formatted as ext4, and the third partition will be named 'BIOS Boot' and left unformatted.";
+    mysystem("sgdisk --change-name=1:GRUB $device");
+    mysystem("sgdisk --change-name=2:ISO $device");
     mysystem("sgdisk --change-name=3:'BIOS Boot' $device");
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
     say "Naming the partions on '$device' is done. Now formatting the partitions...";
-    mysystem("mkfs.fat -I -F 32 -n GLIM ${device}1"); # Format the first partition as FAT32, and set its label to 'GLIM'
-    mysystem("mkfs.ext4 -F -L GLIMISO ${device}2"); # Format the second partition as ext4, and set its label to 'GLIMISO'
+    mysystem("mkfs.fat -I -F 32 -n GRUB ${device}1"); # Format the first partition as FAT32, and set its label to 'GRUB'
+    mysystem("mkfs.ext4 -F -L ISO ${device}2"); # Format the second partition as ext4, and set its label to 'ISO'
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
     say "The partitions on '$device' have been named and formatted.";
 }
@@ -265,7 +267,7 @@ sub mount {
     my $mounts= {};
     say "Mounting the following partitions: @partitions";
     foreach my $part (@partitions) {
-      my $dir = `mktemp -d /tmp/GLIM-mnt-XXXXXX`; chomp($dir);
+      my $dir = `mktemp -d /tmp/$name-mnt-XXXXXX`; chomp($dir);
       myerror "Failed to create temporary directory for mounting $part" if $? != 0;
       say "Mounting $part on temporary directory $dir";
       mysystem("mount $part $dir");
@@ -344,7 +346,7 @@ sub create_iso_dirs {
 }
 
 
-my $grubpartsize = '100M'; #The size of the first partition on the device, which will be used for GLIM and to install GRUB on. The rest of the space on the device (except for the 1MB at the end for the BIOS Boot partition) will be used for the second partition, which is where the ISO files can be stored.
+my $grubpartsize = '100M'; #The size of the first partition on the device, which will be used for GRUB. The rest of the space on the device (except for the 1MB at the end for the BIOS Boot partition) will be used for the second partition, which is where the ISO files can be stored.
 
 #Preparation/checks
 my $user = run_as_root();
@@ -358,7 +360,7 @@ say ""; deviceinfo_and_confirmation($device);
 say ""; wipe_and_create_table($device);
 say ""; create_partitions($device, $grubpartsize);
 say ""; name_and_format_partitions($device);
-#Installing GLIM
+#Installing
 say ""; my $grubversion = grub_grub2_choice();
 say ""; my $grubconfigdir = find_and_check_grub_dir();
 my ($grubpart, $isopart) = @{find_partitions_on_device($device)}[0,1];
@@ -371,4 +373,4 @@ say ""; create_iso_dirs($mounts->{$isopart}, $grubconfigdir, $user);
 #Finishing up
 say ""; umount($grubpart, $isopart);
 say ""; mysystem("rm -rf '$mounts->{$grubpart}' '$mounts->{$isopart}'");
-say "All done ! You can now copy your ISO files to the 'iso' directory on the second partition of the device and boot from it to use GLIM.";
+say "All done ! You can now copy your ISO files to the 'iso' directory on the second partition of the device and boot from it to use $name.";
