@@ -34,7 +34,7 @@ sub check_available_programs {
 sub showdisclaimer {
     print << "END";
 
-This script will format a chosen empty block device (USB-stick, disk, ...) or disk image file with $name's recommended set-up.
+This script will format a chosen empty block device (USB-stick, disk, ...) or disk image file with ${name}'s recommended set-up.
 Although I've tried to be careful, a bug could potentially wipe your whole computer !  So make sure you have a recent backup before executing this script !
 Read the documentation in 'README.md' and the license in 'LICENSE' before running this script.
 
@@ -184,19 +184,19 @@ sub create_partitions {
 
 #Names and formats the partitions on the given device. It expects that there are 3 partitions on the device. This are the filesystems and labels that will be used for the partitions:
 # 1st partition -> Will be named 'GRUB' and formatted as FAT32
-# 2nd partition -> Will be named 'ISO' and formatted as ext4
+# 2nd partition -> Will be named 'ISOS' and formatted as ext4
 # 3rd partition -> Will be named 'BIOS Boot' and will not be formatted
 sub name_and_format_partitions {
     my $device = shift;
     say "Naming and formatting the partitions on '$device'.";
-    say "The first partition will be named 'GRUB' and formatted as FAT32, the second partition will be named 'ISO' and formatted as ext4, and the third partition will be named 'BIOS Boot' and left unformatted.";
+    say "The first partition will be named 'GRUB' and formatted as FAT32, the second partition will be named 'ISOS' and formatted as ext4, and the third partition will be named 'BIOS Boot' and left unformatted.";
     mysystem("sgdisk --change-name=1:GRUB $device");
-    mysystem("sgdisk --change-name=2:ISO $device");
+    mysystem("sgdisk --change-name=2:ISOS $device");
     mysystem("sgdisk --change-name=3:'BIOS Boot' $device");
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
     say "Naming the partions on '$device' is done. Now formatting the partitions...";
     mysystem("mkfs.fat -I -F 32 -n GRUB ${device}1"); # Format the first partition as FAT32, and set its label to 'GRUB'
-    mysystem("mkfs.ext4 -F -L ISO ${device}2"); # Format the second partition as ext4, and set its label to 'ISO'
+    mysystem("mkfs.ext4 -F -L ISOS ${device}2"); # Format the second partition as ext4, and set its label to 'ISOS'
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
     say "The partitions on '$device' have been named and formatted.";
 }
@@ -333,16 +333,16 @@ sub copy_grub_config {
 # - The 2nd argument is the absolute path of the grub2 config directory that is located in the same directory as this script, which contains the distro config files that will be used to create the directories for the ISO files.
 #   The distro config files in the grub2 config directory should be named in the format 'inc-<distroname>.cfg'.
 # - The 3rd argument is a hash with the uid and gid of the user who invoked sudo
-# The result will be a directory named 'iso' with for each <distroname> a subdir. And they will all get the UID and GID of the user who invoked sudo.
-sub create_iso_dirs {
-  my ($isomnt, $grubconfigdir, $user) = @_;
+# The result will be a directory named 'isos' with for each <distroname> a subdir. And they will all get the UID and GID of the user who invoked sudo.
+sub create_isos_dirs {
+  my ($isosmnt, $grubconfigdir, $user) = @_;
   say "Creating the directory layout for the partition for ISO files...";
   for my $distroconfig (glob("$grubconfigdir/*")) {
     $distroconfig =~ /^.*\/inc-(\S+)\.cfg$/ or next;
-    mysystem("mkdir -p '$isomnt/iso/$1'");
+    mysystem("mkdir -p '$isosmnt/isos/$1'");
   }
-  mysystem("chown -R $user->{uid}:$user->{gid} '$isomnt/iso'");
-  say "Directory layout for ISO files created.";
+  mysystem("chown -R $user->{uid}:$user->{gid} '$isosmnt/isos'");
+  say "Directory layout for ISO files created. (A dir name 'isos' with subdirs for each each distro where you can put the ISO files for that distro)";
 }
 
 
