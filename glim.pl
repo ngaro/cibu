@@ -369,7 +369,7 @@ say ""; my $mounts = mount($grubpart, $isopart);
 say ""; my $support = check_bios_efi_support();
 say ""; install_grub($grubversion->{installer}, $support, $mounts->{$grubpart}, $device);
 say ""; copy_grub_config($grubconfigdir, "$mounts->{$grubpart}/boot/$grubversion->{configdir}");
-say ""; create_iso_dirs($mounts->{$isopart}, $grubconfigdir, $user);
+say ""; create_isos_dirs($mounts->{$isopart}, $grubconfigdir, $user);
 #Finishing up
 say ""; umount($grubpart, $isopart);
 say ""; mysystem("rm -rf '$mounts->{$grubpart}' '$mounts->{$isopart}'");
