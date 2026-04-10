@@ -31,7 +31,7 @@ Differences from the original [GLIM (from thias)](https://github.com/thias/glim)
 
 * The partition layout is different to support ISO files > 4GB
 
-* The ISO folder has been moved from `boot/iso/` on the first to just `iso/` on the second partition
+* The ISO folder has been moved from `boot/iso/` on the first to just `isos/` on the second partition
 
 * Partitioning is done for you.
 
@@ -47,14 +47,14 @@ Installation
 * Make sure you have `sudo` and `perl` on your system. _(Most popular Linux distros have them preinstalled)._
 
 * Clone this repo, run `./glim.pl`, and answer the questions.<br>
-Glim uses some external tools to build the stick, so it will check for their presence.<br>
+GLIM uses some external tools to build the stick, so it will check for their presence.<br>
 If you are missing any _(you probably won't)_, install them.<br>
 Your distribution's package manager will almost certainly provide them.
 
 Usage
 -----
 
-Copy your ISO files to the appropriate subdirectories in the `iso` folder on the second partition of the USB stick.<br>
+Copy your ISO files to the appropriate subdirectories in the `isos/` folder on the second partition of the USB stick.<br>
 If the ISO for the distro you want to add doesn't have a subdir yet, it is not supported.
 
 Note that many ISO files are not yet tested in this fork even if they have a subdir.<br>
