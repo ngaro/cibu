@@ -129,6 +129,7 @@ sub check_if_mounted {
         chomp;
         unless(/^\s*$/) {
             print <<END;    #We don't use myerror because no warning about mountpoints is needed.
+
 Sorry, quiting... $device has one or more partitions that are still mounted. (I already found a partition mounted at '$_').
 Please unmount all partitions on the device before running this script.
 (At this point in the script I don't umount things myself for safety reasons.
