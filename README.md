@@ -20,14 +20,13 @@ The only blobs inside are the images _(which you can replace if you want)_.
 
 Screenshots
 -----------
-_The screenshots are from GLIM; screenshots of CiBu are 99% identical.<br>The difference: The bottom line with the name and url._
 
 The main menu (listing all detected distros with their logos):
-![Main Menu](https://github.com/ngaro/glim/raw/perl/screenshots/mainscreen.png)
+![Main Menu](https://github.com/ngaro/cibu/raw/perldev/screenshots/mainscreen.png)
 The submenu for Mint (listing all detected Mint ISOs):
-![Mint Submenu](https://github.com/ngaro/glim/raw/perl/screenshots/mintsubmenu.png)
+![Mint Submenu](https://github.com/ngaro/cibu/raw/perldev/screenshots/mintsubmenu.png)
 Editing booting parameters before booting (you only see this if you press 'e' while on an entry, otherwise it just boots with the default parameters)
-![Mint Edit](https://github.com/ngaro/glim/raw/perl/screenshots/mintedit.png)
+![Mint Edit](https://github.com/ngaro/glim/cibu/perldev/screenshots/mintedit.png)
 
 
 Differences from [GLIM](https://github.com/thias/glim)
