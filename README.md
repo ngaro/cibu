@@ -1,13 +1,13 @@
-GRUB2 Live ISO Multiboot
-========================
+Cross-ISO Boot Utility
+======================
 
-_This version is forked from https://github.com/thias/glim and includes many changes._
+_This software is forked from https://github.com/thias/glim and includes many changes._
 
 
 Overview
 --------
 
-GLIM is a tool to create a boot medium _(usually a USB stick)_ that can boot 
+CiBu is a tool to create a boot medium _(usually a USB stick)_ that can boot
 multiple ISO images from different operating systems. This is meant for everyone who doesn't want to carry around
 a different USB stick for every iso they want to boot from.
 
@@ -15,18 +15,18 @@ If you found this repo, you probably already found [Ventoy](https://www.ventoy.n
 It's undeniable that Ventoy is a tool with way more features.<br>
 But... **Ventoy has [well documented concerns](https://en.wikipedia.org/wiki/Ventoy#Concerns_over_software_security_and_validity_of_open_source_claim) about its security and the validity of its open-source claims !**<br>
 Because of this it's usage is often forbidden in environments where security is an important factor.<br>
-GLIM, on the other hand, is completely open and has source code that is easy to read and well documented.<br>
+CiBu, on the other hand, is completely open and has source code that is easy to read and well documented.<br>
 The only blobs inside are the images _(which you can replace if you want)_.
 
 Screenshots
 -----------
-_The screenshots are from the original repo; screenshots of my fork are 99% identical.<br>The difference: The link at the bottom points to my repo._
+_The screenshots are from GLIM; screenshots of CiBu are 99% identical.<br>The difference: The bottom line with the name and url._
 
 ![Main Menu](https://github.com/ngaro/glim/raw/perl/screenshots/GLIM-3.0-shot1.png)
 ![Ubuntu Submenu](https://github.com/ngaro/glim/raw/perl/screenshots/GLIM-3.0-shot2.png)
 
 
-Differences from the original [GLIM (from thias)](https://github.com/thias/glim)
+Differences from [GLIM](https://github.com/thias/glim)
 --------------
 
 * The partition layout is different to support ISO files > 4GB
@@ -46,8 +46,8 @@ Installation
 
 * Make sure you have `sudo` and `perl` on your system. _(Most popular Linux distros have them preinstalled)._
 
-* Clone this repo, run `./glim.pl`, and answer the questions.<br>
-GLIM uses some external tools to build the stick, so it will check for their presence.<br>
+* Clone this repo, run `./cibu`, and answer the questions.<br>
+CiBu uses some external tools to build the stick, so it will check for their presence.<br>
 If you are missing any _(you probably won't)_, install them.<br>
 Your distribution's package manager will almost certainly provide them.
 
@@ -57,8 +57,8 @@ Usage
 Copy your ISO files to the appropriate subdirectories in the `isos/` folder on the second partition of the USB stick.<br>
 If the ISO for the distro you want to add doesn't have a subdir yet, it is not supported.
 
-Note that many ISO files are not yet tested in this fork even if they have a subdir.<br>
-In the file [TESTED.md](TESTED.md) you can find a list of tested ISO files
+Note that many ISO files are not yet tested in CiBu even if they have a subdir. But if they work in GLIM, they will probably also work here.<br>
+In the file [TESTED.md](TESTED.md) you can find a list of tested ISO filey will also work here.
 
 If you require boot-parameter tweaks, edit the appropriate `boot/grub2/inc-<distroname>_.cfg`
 file on the first partition.<br>
@@ -98,16 +98,15 @@ What I do is create a Linux VM in VirtualBox and give it a extra drive and prete
 Contributing
 ------------
 
-Ways to contribute to GLIM and improve it for everyone:
+Ways to contribute to CiBu and improve it for everyone:
  * Test ISO files and send a PR with the updated [TESTED.md](TESTED.md) file.
  _(Also report ISO files that cause issues)_
  * Send PRs with `inc-distroname.cfg` files for distros that are not yet supported,
  or with tweaks for distros that fail. If possible, also add a picture of the distro's logo in high quality and a version that is shrunk with something like `convert -size 24x24 -background 'rgba(0,0,0,0)' original.svg small.png`
  * Send PRs that improve the inc-distroname.cfg files, the Perl script, or this README.md, ...
 
-Make sure that you:
-* Test everything properly before sending a PR.
-* Also send your PR to the [original repo of thias](https://github.com/thias/glim) if it adds or improves an `inc-distroname.cfg` file.
+Make sure to test everything properly before sending a PR.
+You might also want send a PR to [the GLIM repo](https://github.com/thias/glim), on which this software is based on, if it adds or improves an `inc-distroname.cfg` file.
 
 Credits
 -------
@@ -121,5 +120,5 @@ Legal stuff
 -----------
 
 The file `grub2/themes/invader/background.png` is © 2008 payalnic (DeviantArt).<br>
-In this version of GLIM, all other files are licensed under GPLv3.
+All other files are licensed under GPLv3.
 See the `LICENSE` file for all details.

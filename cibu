@@ -2,7 +2,7 @@
 use strict; use warnings; use v5.30;
 use FindBin;
 
-my $name = "GLIM";
+my $name = "CiBu";
 
 #Prints an error message passed as an argument and exit with code 1
 sub myerror {
