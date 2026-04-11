@@ -42,7 +42,7 @@ sub check_available_programs {
 sub showdisclaimer {
     print << "END";
 
-This script will format a chosen empty block device (USB-stick, disk, ...) or disk image file with ${name}'s recommended set-up.
+This script will format a chosen block device (USB-stick, disk, ...) or disk image file with ${name}'s recommended set-up.
 Although I've tried to be careful, a bug could potentially wipe your whole computer !  So make sure you have a recent backup before executing this script !
 Read the documentation in 'README.md' and the license in 'LICENSE' before running this script.
 
@@ -360,7 +360,7 @@ sub create_isos_dirs {
 #Preparation/checks
 my $user = run_as_root();
 showdisclaimer();
-ask_for_confirmation("If you have read, understood & fully accepted the disclaimer and the rest of the text above, then please enter 'yes' to continue, otherwise enter 'no' to cancel: ");
+ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 #Formatting and setting up the device
 say ""; my $device = choose_device();
