@@ -6,7 +6,7 @@ use FindBin;
 my $name = "CiBu";
 my $tmpmountpointprefix = "/tmp/$name-mnt-";
 my $cibupartname = "CIBUSYS";
-my $isopartname = "ISOS';
+my $isopartname = "ISOS";
 my $isosdir = 'isos';
 my $cibupartsize = '100M';
 my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
