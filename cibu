@@ -5,8 +5,8 @@ use FindBin;
 #Global variables that you probably don't want to change. They are here to prevent hardcoding
 my $name = "CiBu";
 my $tmpmountpointprefix = "/tmp/$name-mnt-";
-my $cibupartname = $name . 'SYS';
-my $isopartname = $name . 'ISOS';
+my $cibupartname = "CIBUSYS";
+my $isopartname = "ISOS';
 my $isosdir = 'isos';
 my $cibupartsize = '100M';
 my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
