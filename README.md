@@ -22,8 +22,12 @@ Screenshots
 -----------
 _The screenshots are from GLIM; screenshots of CiBu are 99% identical.<br>The difference: The bottom line with the name and url._
 
-![Main Menu](https://github.com/ngaro/glim/raw/perl/screenshots/GLIM-3.0-shot1.png)
-![Ubuntu Submenu](https://github.com/ngaro/glim/raw/perl/screenshots/GLIM-3.0-shot2.png)
+The main menu (listing all detected distros with their logos):
+![Main Menu](https://github.com/ngaro/glim/raw/perl/screenshots/mainscreen.png)
+The submenu for Mint (listing all detected Mint ISOs):
+![Mint Submenu](https://github.com/ngaro/glim/raw/perl/screenshots/mintsubmenu.png)
+Editing booting parameters before booting (you only see this if you press 'e' while on an entry, otherwise it just boots with the default parameters)
+![Mint Edit](https://github.com/ngaro/glim/raw/perl/screenshots/mintedit.png)
 
 
 Differences from [GLIM](https://github.com/thias/glim)
