@@ -352,7 +352,7 @@ sub create_isos_dirs {
     $distroconfig =~ /^.*\/inc-(\S+)\.cfg$/ or next;
     mysystem("mkdir -p '$isosmnt/$isosdir/$1'");
   }
-  mysystem("chown -R $user->{uid}:$user->{gid} '$isosmnt/isosdir'");
+  mysystem("chown -R $user->{uid}:$user->{gid} '$isosmnt/$isosdir'");
   say "Directory layout for ISO files created. (A dir name '$isosdir' with subdirs for each distro where you can put the ISO files for that distro)";
 }
 
