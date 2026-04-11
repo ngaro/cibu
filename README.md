@@ -22,11 +22,11 @@ Screenshots
 -----------
 
 The main menu (listing all detected distros with their logos):
-![Main Menu](https://github.com/ngaro/cibu/raw/perldev/screenshots/mainscreen.png)
+![Main Menu](https://github.com/ngaro/cibu/raw/perl/screenshots/mainscreen.png)
 The submenu for Mint (listing all detected Mint ISOs):
-![Mint Submenu](https://github.com/ngaro/cibu/raw/perldev/screenshots/mintsubmenu.png)
+![Mint Submenu](https://github.com/ngaro/cibu/raw/perl/screenshots/mintsubmenu.png)
 Editing booting parameters before booting (you only see this if you press 'e' while on an entry, otherwise it just boots with the default parameters)
-![Mint Edit](https://github.com/ngaro/glim/cibu/perldev/screenshots/mintedit.png)
+![Mint Edit](https://github.com/ngaro/cibu/raw/perl/screenshots/mintedit.png)
 
 
 Differences from [GLIM](https://github.com/thias/glim)
