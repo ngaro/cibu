@@ -2,12 +2,20 @@
 use strict; use warnings; use v5.30;
 use FindBin;
 
+#Global variables that you probably don't want to change. They are here to prevent hardcoding
 my $name = "CiBu";
+my $tmpmountpointprefix = "/tmp/$name-mnt-";
+my $cibupartname = "CIBUSYS";
+my $isopartname = "ISOS";
+my $isosdir = 'isos';
+my $cibupartsize = '100M';
+my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
+
 
 #Prints an error message passed as an argument and exit with code 1
 sub myerror {
   say "ERROR: @_";
-  say "Depending on where in the script this error happened, you might want to umount newly created partitions and remove their mountpoints (which should be in /tmp and start with '$name-mnt-')";
+  say "Depending on where in the script this error happened, you might want to umount newly created partitions and remove their mountpoints. (Their paths are '${tmpmountpointprefix}*')";
   exit(1);
 }
 
@@ -34,7 +42,7 @@ sub check_available_programs {
 sub showdisclaimer {
     print << "END";
 
-This script will format a chosen empty block device (USB-stick, disk, ...) or disk image file with ${name}'s recommended set-up.
+This script will format a chosen block device (USB-stick, disk, ...) or disk image file with ${name}'s recommended set-up.
 Although I've tried to be careful, a bug could potentially wipe your whole computer !  So make sure you have a recent backup before executing this script !
 Read the documentation in 'README.md' and the license in 'LICENSE' before running this script.
 
@@ -120,12 +128,14 @@ sub check_if_mounted {
     foreach(@partitions) {
         chomp;
         unless(/^\s*$/) {
-            myerror <<END;
-$device has one or more partitions that are still mounted. (I already found a partition mounted at '$_').
+            print <<END;    #We don't use myerror because no warning about mountpoints is needed.
+
+Sorry, quiting... $device has one or more partitions that are still mounted. (I already found a partition mounted at '$_').
 Please unmount all partitions on the device before running this script.
 (At this point in the script I don't umount things myself for safety reasons.
 When the device get's new partitions later, I will do mounting and umounting myself)
 END
+            exit(1);
         }
     }
     say "No partitions on '$device' are mounted.";
@@ -158,7 +168,7 @@ sub wipe_and_create_table {
     my $partitions = find_partitions_on_device($device);
     say "Wiping '$device' and creating a new GPT partition table on it...";
     foreach(@$partitions) {
-        mysystem("dd if=/dev/zero of=$_ bs=512 count=1024 conv=fsync"); #Wipe the first 512k of each partition, to make sure the old filesystem is gone.
+        mysystem("dd if=/dev/zero of=$_ $ddlength conv=fsync"); #Wipe the beginning of each partition, $ddlength is a combination of the bs and count options of dd
     }
     mysystem("sgdisk --zap-all $device"); #Wipe the partition table
     mysystem("sgdisk --mbrtogpt $device"); #Create a new GPT partition table
@@ -171,10 +181,10 @@ sub wipe_and_create_table {
 ## 2nd partition -> Will use the remaining space on the device after creating the 1st and 3rd partition
 ## 3rd partition -> Will be 1MB in size, at the end of the device and will get the GUID and typecode to indicate that it is a BIOS Boot partition.
 sub create_partitions {
-    my ($device, $grubpartsize) = @_;
+    my ($device, $cibupartsize) = @_;
     say "Creating the 3 partitions on '$device' needed by $name.";
-    say "The 1st partition will be used for $name and will have a size of $grubpartsize, the 2nd partition for the iso files and the 3rd partition will be used as the BIOS Boot partition by GRUB.";
-    mysystem("sgdisk --new=1:0:+$grubpartsize $device"); # Create the first partition, starting at the beginning of the device, and using the specified size
+    say "The 1st partition will be used for $name and will have a size of $cibupartsize, the 2nd partition for the iso files and the 3rd partition will be used as the BIOS Boot partition by GRUB.";
+    mysystem("sgdisk --new=1:0:+$cibupartsize $device"); # Create the first partition, starting at the beginning of the device, and using the specified size
     mysystem("sgdisk --new=3:-1M:0 --typecode=3:ef02 --partition-guid=3:21686148-6449-6E6F-744E-656564454649 $device"); # Create the third partition, starting at the end of the device
     #The 3rd partition will be used as the BIOS Boot partition by GRUB, so we have to make sure that it is 1MB, uses 21686148-6449-6E6F-744E-656564454649 as special GUID and typecode ef02 to indicate this
     mysystem("sgdisk --new=2:0:0 $device"); # Create the second partition, using the remaining space on the device
@@ -183,22 +193,25 @@ sub create_partitions {
 }
 
 #Names and formats the partitions on the given device. It expects that there are 3 partitions on the device. This are the filesystems and labels that will be used for the partitions:
-# 1st partition -> Will be named 'GRUB' and formatted as FAT32
-# 2nd partition -> Will be named 'ISOS' and formatted as ext4
+# 1st partition -> Will be named $cibupartname and formatted as FAT32
+# 2nd partition -> Will be named $isopartname and formatted as ext4
 # 3rd partition -> Will be named 'BIOS Boot' and will not be formatted
+# Returns a arrayref with the paths of the first and second partition
 sub name_and_format_partitions {
     my $device = shift;
     say "Naming and formatting the partitions on '$device'.";
-    say "The first partition will be named 'GRUB' and formatted as FAT32, the second partition will be named 'ISOS' and formatted as ext4, and the third partition will be named 'BIOS Boot' and left unformatted.";
-    mysystem("sgdisk --change-name=1:GRUB $device");
-    mysystem("sgdisk --change-name=2:ISOS $device");
+    say "The first partition will be named '$cibupartname' and formatted as FAT32, the second partition will be named '$isopartname' and formatted as ext4, and the third partition will be named 'BIOS Boot' and left unformatted.";
+    mysystem("sgdisk --change-name=1:$cibupartname $device");
+    mysystem("sgdisk --change-name=2:$isopartname $device");
     mysystem("sgdisk --change-name=3:'BIOS Boot' $device");
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
     say "Naming the partions on '$device' is done. Now formatting the partitions...";
-    mysystem("mkfs.fat -I -F 32 -n GRUB ${device}1"); # Format the first partition as FAT32, and set its label to 'GRUB'
-    mysystem("mkfs.ext4 -F -L ISOS ${device}2"); # Format the second partition as ext4, and set its label to 'ISOS'
+    my ($cibupart, $isopart) = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
+    mysystem("mkfs.fat -I -F 32 -n $cibupartname $cibupart"); # Format the first partition as FAT32, and set its label
+    mysystem("mkfs.ext4 -F -L $isopartname $isopart"); # Format the second partition as ext4, and set its label
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
     say "The partitions on '$device' have been named and formatted.";
+    return [$cibupart, $isopart];
 }
 
 #Checks if grub2-install or grub-install is available on the system, and returns a hash with a key 'installer' with this command as value.
@@ -267,7 +280,7 @@ sub mount {
     my $mounts= {};
     say "Mounting the following partitions: @partitions";
     foreach my $part (@partitions) {
-      my $dir = `mktemp -d /tmp/$name-mnt-XXXXXX`; chomp($dir);
+      my $dir = `mktemp -d ${tmpmountpointprefix}XXXXXX`; chomp($dir);
       myerror "Failed to create temporary directory for mounting $part" if $? != 0;
       say "Mounting $part on temporary directory $dir";
       mysystem("mount $part $dir");
@@ -333,44 +346,41 @@ sub copy_grub_config {
 # - The 2nd argument is the absolute path of the grub2 config directory that is located in the same directory as this script, which contains the distro config files that will be used to create the directories for the ISO files.
 #   The distro config files in the grub2 config directory should be named in the format 'inc-<distroname>.cfg'.
 # - The 3rd argument is a hash with the uid and gid of the user who invoked sudo
-# The result will be a directory named 'isos' with for each <distroname> a subdir. And they will all get the UID and GID of the user who invoked sudo.
+# The result will be a directory named $isosdir with for each <distroname> a subdir. And they will all get the UID and GID of the user who invoked sudo.
 sub create_isos_dirs {
   my ($isosmnt, $grubconfigdir, $user) = @_;
   say "Creating the directory layout for the partition for ISO files...";
   for my $distroconfig (glob("$grubconfigdir/*")) {
     $distroconfig =~ /^.*\/inc-(\S+)\.cfg$/ or next;
-    mysystem("mkdir -p '$isosmnt/isos/$1'");
+    mysystem("mkdir -p '$isosmnt/$isosdir/$1'");
   }
-  mysystem("chown -R $user->{uid}:$user->{gid} '$isosmnt/isos'");
-  say "Directory layout for ISO files created. (A dir name 'isos' with subdirs for each each distro where you can put the ISO files for that distro)";
+  mysystem("chown -R $user->{uid}:$user->{gid} '$isosmnt/$isosdir'");
+  say "Directory layout for ISO files created. (A dir name '$isosdir' with subdirs for each distro where you can put the ISO files for that distro)";
 }
 
-
-my $grubpartsize = '100M'; #The size of the first partition on the device, which will be used for GRUB. The rest of the space on the device (except for the 1MB at the end for the BIOS Boot partition) will be used for the second partition, which is where the ISO files can be stored.
 
 #Preparation/checks
 my $user = run_as_root();
 showdisclaimer();
-ask_for_confirmation("If you have read, understood & fully accepted the license and the rest of the text above, then please enter 'yes'. Otherwise enter 'no' to cancel: ");
+ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 #Formatting and setting up the device
 say ""; my $device = choose_device();
 say ""; check_if_mounted($device);
 say ""; deviceinfo_and_confirmation($device);
 say ""; wipe_and_create_table($device);
-say ""; create_partitions($device, $grubpartsize);
-say ""; name_and_format_partitions($device);
+say ""; create_partitions($device, $cibupartsize);
+say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device)};
 #Installing
 say ""; my $grubversion = grub_grub2_choice();
 say ""; my $grubconfigdir = find_and_check_grub_dir();
-my ($grubpart, $isopart) = @{find_partitions_on_device($device)}[0,1];
-say ""; umount($grubpart, $isopart); #Just in case they are automounted
-say ""; my $mounts = mount($grubpart, $isopart);
+say ""; umount($cibupart, $isopart); #Just in case they are automounted
+say ""; my $mounts = mount($cibupart, $isopart);
 say ""; my $support = check_bios_efi_support();
-say ""; install_grub($grubversion->{installer}, $support, $mounts->{$grubpart}, $device);
-say ""; copy_grub_config($grubconfigdir, "$mounts->{$grubpart}/boot/$grubversion->{configdir}");
+say ""; install_grub($grubversion->{installer}, $support, $mounts->{$cibupart}, $device);
+say ""; copy_grub_config($grubconfigdir, "$mounts->{$cibupart}/boot/$grubversion->{configdir}");
 say ""; create_isos_dirs($mounts->{$isopart}, $grubconfigdir, $user);
 #Finishing up
-say ""; umount($grubpart, $isopart);
-say ""; mysystem("rm -rf '$mounts->{$grubpart}' '$mounts->{$isopart}'");
-say "All done ! You can now copy your ISO files to the 'isos' directory on the second partition of the device and boot from it to use $name.";
+say ""; umount($cibupart, $isopart);
+say ""; mysystem("rm -rf '$mounts->{$cibupart}' '$mounts->{$isopart}'");
+say "All done ! You can now copy your ISO files to the '$isosdir' directory on the second partition of the device and boot from it to use $name. (The partition is '$isopart and has the label '$isopartname')";
