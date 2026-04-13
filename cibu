@@ -398,7 +398,7 @@ showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 say ""; my ($device, $cibupart, $isopart) = @{create_new_device($cibupartsize, $ddlength)};
-say ""; my $mounts = @{install_cibu($device, $cibupart, $isopart, $user)};
+say ""; my $mounts = %{install_cibu($device, $cibupart, $isopart, $user)};
 #Finishing up
 say ""; umount($cibupart, $isopart);
 say ""; mysystem("rm -rf '$mounts->{$cibupart}' '$mounts->{$isopart}'");
