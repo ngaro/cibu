@@ -358,7 +358,7 @@ sub create_isos_dirs {
 
 #Create a new cibu device but don't install the cibu system on it yet. 1st argument is the size of the partition for the cibu system
 #Returns a arrayref with the path of the device, the path of the partition with the cibu system and the path of the partition for the ISO files, in that order.
-sub create_new_device() {
+sub create_new_device {
     my ($cibupartsize, $ddlength) = @_;
     say "Preparing a device for $name creation...";
     say ""; my $device = choose_device();
