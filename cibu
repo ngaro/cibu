@@ -358,19 +358,27 @@ sub create_isos_dirs {
   say "Directory layout for ISO files created. (A dir name '$isosdir' with subdirs for each distro where you can put the ISO files for that distro)";
 }
 
+#Create a new cibu device but don't install the cibu system on it yet.
+#Returns a arrayref with the path of the device, the path of the partition with the cibu system and the path of the partition for the ISO files, in that order.
+sub create_new_device() {
+    say "Preparing a device for $name creation...";
+    say ""; my $device = choose_device();
+    say ""; check_if_mounted($device);
+    say ""; deviceinfo_and_confirmation($device);
+    say ""; wipe_and_create_table($device);
+    say ""; create_partitions($device, $cibupartsize);
+    say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device)};
+    say "Device '$device' is now ready for $name installation. The partition with the $name system is '$cibupart' and the partition for the ISO files is '$isopart'.";
+    return \($device, $cibupart, $isopart);
+}
+
 
 #Preparation/checks
 my $user = run_as_root();
 showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
-#Formatting and setting up the device
-say ""; my $device = choose_device();
-say ""; check_if_mounted($device);
-say ""; deviceinfo_and_confirmation($device);
-say ""; wipe_and_create_table($device);
-say ""; create_partitions($device, $cibupartsize);
-say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device)};
+say ""; my ($device, $cibupart, $isopart) = @{create_new_device()};
 #Installing
 say ""; my $grubversion = grub_grub2_choice();
 say ""; my $grubconfigdir = find_and_check_grub_dir();
