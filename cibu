@@ -8,8 +8,6 @@ my $tmpmountpointprefix = "/tmp/$name-mnt-";
 my $cibupartname = "CIBUSYS";
 my $isopartname = "ISOS";
 my $isosdir = 'isos';
-my $cibupartsize = '100M';
-my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
 
 
 #Prints an error message passed as an argument and exit with code 1
@@ -164,7 +162,7 @@ sub find_partitions_on_device {
 
 #Wipes the filesystem signatures of the partitions on the given devices, wipes the partition table and creates a new GPT partition table
 sub wipe_and_create_table {
-    my $device = shift;
+    my ($device, $ddlength) = @_;
     my $partitions = find_partitions_on_device($device);
     say "Wiping '$device' and creating a new GPT partition table on it...";
     foreach(@$partitions) {
@@ -358,29 +356,50 @@ sub create_isos_dirs {
   say "Directory layout for ISO files created. (A dir name '$isosdir' with subdirs for each distro where you can put the ISO files for that distro)";
 }
 
+#Create a new cibu device but don't install the cibu system on it yet. 1st argument is the size of the partition for the cibu system
+#Returns a arrayref with the path of the device, the path of the partition with the cibu system and the path of the partition for the ISO files, in that order.
+sub create_new_device {
+    my ($cibupartsize, $ddlength) = @_;
+    say "Preparing a device for $name creation...";
+    say ""; my $device = choose_device();
+    say ""; check_if_mounted($device);
+    say ""; deviceinfo_and_confirmation($device);
+    say ""; wipe_and_create_table($device, $ddlength);
+    say ""; create_partitions($device, $cibupartsize);
+    say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device)};
+    say "Device '$device' is now ready for $name installation. The partition with the $name system is '$cibupart' and the partition for the ISO files is '$isopart'.";
+    return [$device, $cibupart, $isopart];
+}
+
+#Installs cibu on a device that already has the correct partition table.
+#First argument is the device, 2nd argument partition with the cibu system, 3rd argument partition for the ISO files, 4th argument is a hash with uid and gid of of user who should own the isos dir
+#It is expected that the partitions already have the correct labels and (empty) filesystems. Returns a arrayref with the mountpoints of the partition with the cibu system and the partition for the ISO files, in that order.
+sub install_cibu {
+    my ($device, $cibupart, $isopart, $user) = @_;
+    say "Installing $name on the device...";
+    say ""; my $grubversion = grub_grub2_choice();
+    say ""; my $grubconfigdir = find_and_check_grub_dir();
+    say ""; umount($cibupart, $isopart); #Just in case they are automounted
+    say ""; my $mounts = mount($cibupart, $isopart);
+    say ""; my $support = check_bios_efi_support();
+    say ""; install_grub($grubversion->{installer}, $support, $mounts->{$cibupart}, $device);
+    say ""; copy_grub_config($grubconfigdir, "$mounts->{$cibupart}/boot/$grubversion->{configdir}");
+    say ""; create_isos_dirs($mounts->{$isopart}, $grubconfigdir, $user);
+    return [$mounts->{$cibupart}, $mounts->{$isopart}];
+}
+
+#Settings
+my $cibupartsize = '100M';
+my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
 
 #Preparation/checks
 my $user = run_as_root();
 showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
-#Formatting and setting up the device
-say ""; my $device = choose_device();
-say ""; check_if_mounted($device);
-say ""; deviceinfo_and_confirmation($device);
-say ""; wipe_and_create_table($device);
-say ""; create_partitions($device, $cibupartsize);
-say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device)};
-#Installing
-say ""; my $grubversion = grub_grub2_choice();
-say ""; my $grubconfigdir = find_and_check_grub_dir();
-say ""; umount($cibupart, $isopart); #Just in case they are automounted
-say ""; my $mounts = mount($cibupart, $isopart);
-say ""; my $support = check_bios_efi_support();
-say ""; install_grub($grubversion->{installer}, $support, $mounts->{$cibupart}, $device);
-say ""; copy_grub_config($grubconfigdir, "$mounts->{$cibupart}/boot/$grubversion->{configdir}");
-say ""; create_isos_dirs($mounts->{$isopart}, $grubconfigdir, $user);
+say ""; my ($device, $cibupart, $isopart) = @{create_new_device($cibupartsize, $ddlength)};
+say ""; my ($cibumnt, $isosmnt) = @{install_cibu($device, $cibupart, $isopart, $user)};
 #Finishing up
 say ""; umount($cibupart, $isopart);
-say ""; mysystem("rm -rf '$mounts->{$cibupart}' '$mounts->{$isopart}'");
+say ""; mysystem("rm -rf '$cibumnt' '$isosmnt'"); #Remove the temporary mountpoints
 say "All done ! You can now copy your ISO files to the '$isosdir' directory on the second partition of the device and boot from it to use $name. (The partition is '$isopart and has the label '$isopartname')";
