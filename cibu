@@ -8,8 +8,6 @@ my $tmpmountpointprefix = "/tmp/$name-mnt-";
 my $cibupartname = "CIBUSYS";
 my $isopartname = "ISOS";
 my $isosdir = 'isos';
-my $cibupartsize = '100M';
-my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
 
 
 #Prints an error message passed as an argument and exit with code 1
@@ -164,7 +162,7 @@ sub find_partitions_on_device {
 
 #Wipes the filesystem signatures of the partitions on the given devices, wipes the partition table and creates a new GPT partition table
 sub wipe_and_create_table {
-    my $device = shift;
+    my ($device, $ddlength) = @_;
     my $partitions = find_partitions_on_device($device);
     say "Wiping '$device' and creating a new GPT partition table on it...";
     foreach(@$partitions) {
@@ -361,12 +359,12 @@ sub create_isos_dirs {
 #Create a new cibu device but don't install the cibu system on it yet. 1st argument is the size of the partition for the cibu system
 #Returns a arrayref with the path of the device, the path of the partition with the cibu system and the path of the partition for the ISO files, in that order.
 sub create_new_device() {
-    my $cibupartsize = shift;
+    my ($cibupartsize, $ddlength) = @_;
     say "Preparing a device for $name creation...";
     say ""; my $device = choose_device();
     say ""; check_if_mounted($device);
     say ""; deviceinfo_and_confirmation($device);
-    say ""; wipe_and_create_table($device);
+    say ""; wipe_and_create_table($device, $ddlength);
     say ""; create_partitions($device, $cibupartsize);
     say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device)};
     say "Device '$device' is now ready for $name installation. The partition with the $name system is '$cibupart' and the partition for the ISO files is '$isopart'.";
@@ -389,12 +387,16 @@ sub install_cibu {
     return $mounts;
 }
 
+#Settings
+my $cibupartsize = '100M';
+my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
+
 #Preparation/checks
 my $user = run_as_root();
 showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
-say ""; my ($device, $cibupart, $isopart) = @{create_new_device()};
+say ""; my ($device, $cibupart, $isopart) = @{create_new_device($cibupartsize, $ddlength)};
 say ""; my $mounts = install_cibu($device, $cibupart, $isopart);
 #Finishing up
 say ""; umount($cibupart, $isopart);
