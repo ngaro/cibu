@@ -371,10 +371,11 @@ sub create_new_device() {
     return \($device, $cibupart, $isopart);
 }
 
-#Installs cibu on a device that already has the correct partition table. First argument is the device, 2nd argument is the partition with the cibu system and 3rd argument is the partition for the ISO files.
+#Installs cibu on a device that already has the correct partition table.
+#First argument is the device, 2nd argument partition with the cibu system, 3rd argument partition for the ISO files, 4th argument is a hash with uid and gid of of user who should own the isos dir
 #It is expected that the partitions already have the correct labels and (empty) filesystems. Returns a hash with the partitions as keys and the temporary directories they are mounted on as values.
 sub install_cibu {
-    my ($device, $cibupart, $isopart) = @_;
+    my ($device, $cibupart, $isopart, $user) = @_;
     say "Installing $name on the device...";
     say ""; my $grubversion = grub_grub2_choice();
     say ""; my $grubconfigdir = find_and_check_grub_dir();
@@ -397,7 +398,7 @@ showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 say ""; my ($device, $cibupart, $isopart) = @{create_new_device($cibupartsize, $ddlength)};
-say ""; my $mounts = install_cibu($device, $cibupart, $isopart);
+say ""; my $mounts = install_cibu($device, $cibupart, $isopart, $user);
 #Finishing up
 say ""; umount($cibupart, $isopart);
 say ""; mysystem("rm -rf '$mounts->{$cibupart}' '$mounts->{$isopart}'");
