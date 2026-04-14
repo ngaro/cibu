@@ -73,22 +73,24 @@ sub run_as_root {
 }
 
 #Checks if the given device is a CIBU device by using lsblk to check if the first partition has the label that the first partition of CIBU-device should have (according to $wantedpartitions).
-#Returns 1 if a partition with the correct label is found, otherwise returns undef.
+#Accepts the $wantedpartitions settings as argument to check whether the device is a CIBU-device.
 sub is_cibu_device {
-  my $device = shift;
+  my ($device, $wanted_partitions) = @_;
   my @labels = split("\n", `lsblk -o label -pn $device`);
-  if(exists $labels[1] && $labels[1] eq $wantedpartitions->[0]->{label}) { return 1; } else { return undef; } #$label[1] because $labels[0] is $device itself
+  if(exists $labels[1] && $labels[1] eq $wanted_partitions->[0]->{label}) { return 1; } else { return undef; } #$label[1] because $labels[0] is $device itself
 }
 
 
 #Returns a hash with as keys the available block devices and as values what kind of device they are. (For now everything is just 'blockdevice')
+#Accepts the $wantedpartitions settings as argument to check whether the device is a CIBU-device
 sub find_available_block_devices {
+    my $wantedpartitions = shift;
     my @blockdevices = `lsblk -o name -pn --nodeps`;
     chomp @blockdevices;
     @blockdevices = grep { !/\/sr\d+$/ } @blockdevices; #Filter out CD-ROM drives
     my $devicetypes = {};
     foreach(@blockdevices) {
-      if(is_cibu_device($_)) {
+      if(is_cibu_device($_,$wantedpartitions)) {
         $devicetypes->{$_} = 'CIBU-device';
       } else {
         $devicetypes->{$_} = 'blockdevice';
@@ -101,8 +103,9 @@ sub find_available_block_devices {
 #If the user enters 0 or a path that is not a block device the script will be cancelled with an error message.
 #The last number will be used to show detailed info of all block devices and afterwards this function will be called again.
 #When we implement the option to create a disk image file in the future, the check for a block device will be removed
+#Receives the $wantedpartitions setting because it will be used to check whether a device is a CIBU-device
 sub choose_device {
-    my $blockdevices = find_available_block_devices();
+    my $blockdevices = find_available_block_devices(shift);
     my @sorteddevices = sort keys %$blockdevices;
     my @options = ("Cancel");
     foreach(@sorteddevices) {
@@ -127,7 +130,7 @@ END
           mysystem("fdisk -l $_");
           say "";
         }
-        return choose_device();
+        return choose_device($wantedpartitions);
     } elsif($answer =~ /^\s*(\d+)\s*$/ && exists $options[$1]) {
       return $sorteddevices[$1-1]; #The first option is not part of @devices, so we have to subtract 1 from the index
     } elsif($answer =~ /^\s*(\S.*?)\s*$/ && -b $1) {
@@ -381,7 +384,7 @@ sub create_isos_dirs {
 sub create_new_device {
     my ($wantedpartitions, $ddlength) = @_;
     say "Preparing a device for $name creation...";
-    say ""; my $device = choose_device();
+    say ""; my $device = choose_device($wantedpartitions);
     say ""; check_if_mounted($device);
     say ""; deviceinfo_and_confirmation($device);
     say ""; wipe_and_create_table($device, $ddlength);
