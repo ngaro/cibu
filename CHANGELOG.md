@@ -1,7 +1,12 @@
 # CIDU Change Log
-All notable changes to this project will be documented in this file.
+- All notable changes to this project will be documented in this file
+- Versioning uses the `x.y.z` format, where:
+  - 'x' jumps to 1 when I have 5 known testers and from that point on only when a new feature breaks compatibility with previous versions
+  - 'y' increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
+  - 'z' increases with bug fixes
+
   
-## v0.1 [Work in Progress] - 2026-04-14
+## Version 0.1.0 - Date of release: 2026-04-14 epoch time 1776196058
 
 ### Changes
 
