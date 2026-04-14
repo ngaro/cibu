@@ -378,7 +378,7 @@ sub install_cibu {
     say ""; my $grubversion = grub_grub2_choice();
     say ""; my $grubconfigdir = find_and_check_grub_dir();
     say ""; umount($cibupart); #Just in case it's automounted
-    say ""; my $cibumnt = mount($cibupart)->{$cibupart};
+    say ""; my $cibumnt = mount($cibupart);
     say ""; my $support = check_bios_efi_support();
     say ""; install_grub($grubversion->{installer}, $support, $cibumnt, $device);
     say ""; copy_grub_config($grubconfigdir, "$cibumnt/boot/$grubversion->{configdir}");
