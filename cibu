@@ -72,12 +72,16 @@ sub run_as_root {
     return $user;
 }
 
-#Finds the available block devices and return them as a list. Blockdevices that are partitions of other blockdevices will not be included in the list.
+#Returs a hash with as keys the available block devices and as values what kind of device they are. (For now everything is just 'blockdevice')
 sub find_available_block_devices {
     my @blockdevices = `lsblk -o name -pn --nodeps`;
     chomp @blockdevices;
     @blockdevices = grep { !/\/sr\d+$/ } @blockdevices; #Filter out CD-ROM drives
-    return \@blockdevices;
+    my $devicetypes = {};
+    foreach(@blockdevices) {
+      $devicetypes->{$_} = 'blockdevice';
+    }
+    return $devicetypes;
 }
 
 #Asks the user to choose a block device from a list of available block devices or to enter a path to a block device. Returns the chosen block device.
@@ -85,7 +89,12 @@ sub find_available_block_devices {
 #The last number will be used to show detailed info of all block devices and afterwards this function will be called again.
 #When we implement the option to create a disk image file in the future, the check for a block device will be removed
 sub choose_device {
-    my @options = ("Cancel", @{find_available_block_devices()});
+    my $blockdevices = find_available_block_devices();
+    my @devices = ();
+    foreach(sort keys %$blockdevices) {
+      push @devices, "$_ -> $blockdevices->{$_}";
+    }
+    my @options = ("Cancel", @devices);
     print << 'END';
 Choose the number of a blockdevice to overwrite. Choose option 0 to cancel.
 You can also enter the full path. This will be useful IN THE FUTURE if you want to create a disk image file instead of a physical block device.
