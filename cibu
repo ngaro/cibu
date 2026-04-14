@@ -402,4 +402,4 @@ say ""; my ($cibumnt, $isosmnt) = @{install_cibu($device, $cibupart, $isopart, $
 #Finishing up
 say ""; umount($cibupart, $isopart);
 say ""; mysystem("rm -rf '$cibumnt' '$isosmnt'"); #Remove the temporary mountpoints
-say "All done ! You can now copy your ISO files to the '$isosdir' directory on the second partition of the device and boot from it to use $name. (The partition is '$isopart and has the label '$isopartname')";
+say "All done ! You can now copy your ISO files to the '$isosdir' directory on the second partition of the device and boot from it to use $name. (The partition is '$isopart and has the label '$wantedpartitions->[0]->{label}')";
