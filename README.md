@@ -49,7 +49,9 @@ Installation
 
 * Make sure you have `sudo` and `perl` on your system. _(Most popular Linux distros have them preinstalled)._
 
-* Clone this repo, run `./cibu`, and answer the questions.<br>
+* Download [the zipfile with CIDU's code](https://github.com/ngaro/cibu/archive/refs/heads/perl.zip) and extract it somewhere.
+
+* Run `./cibu` in the extracted directory and follow the instructions.
 CIBU uses some external tools to build the stick, so it will check for their presence.<br>
 If you are missing any _(you probably won't)_, install them.<br>
 Your distribution's package manager will almost certainly provide them.
