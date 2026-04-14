@@ -13,19 +13,19 @@ All notable changes to this project will be documented in this file.
 - Rewrote `README.md` only keeping the "Special Cases" section
 - Added a mention of the version (on the 2nd line of `grub2/grub.cfg`)
 - Removed `glim.sh` and took the main ideas to rewrite into `cidu`. Main changes:
--- Perl instead of shell to make it easier to maintain and add features
--- Code is split into lots of separate well-documented functions
--- Hardcoding is avoided as much as possible
--- More interactive with advice when questions are asked
--- Show lots of info about what is actually happening
--- Checks for all necessary tools before starting the real work
--- Setting up the partitions and filesystems instead of letting the user do it manually
--- Block devices that already contain CIDU are detected and marked as such
--- 2 partitions instead of one are created
--- The 1st one is almost identical to the one GLIM creates, but the label is GLIMSYS and the dir 'isos' has been removed
--- The 2nd one is an ext4 with the label ISOS and now has the dir 'isos' that used be in the first partition
--- Because of ext4 large iso's ( > 4GB ) are now also supported
--- Inner workings of the script are different, but the end result is reasonably similar to a device created with GLIM
+  - Perl instead of shell to make it easier to maintain and add features
+  - Code is split into lots of separate well-documented functions
+  - Hardcoding is avoided as much as possible
+  - More interactive with advice when questions are asked
+  - Show lots of info about what is actually happening
+  - Checks for all necessary tools before starting the real work
+  - Setting up the partitions and filesystems instead of letting the user do it manually
+  - Block devices that already contain CIDU are detected and marked as such
+  - 2 partitions instead of one are created
+  - The 1st one is almost identical to the one GLIM creates, but the label is GLIMSYS and the dir 'isos' has been removed
+  - The 2nd one is an ext4 with the label ISOS and now has the dir 'isos' that used be in the first partition
+  - Because of ext4 large iso's ( > 4GB ) are now also supported
+  - Inner workings of the script are different, but the end result is reasonably similar to a device created with GLIM
 
 ### Features that I plan to add in the future
 - Add support for booting Windows installer iso's
