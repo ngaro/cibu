@@ -105,7 +105,8 @@ sub find_available_block_devices {
 #When we implement the option to create a disk image file in the future, the check for a block device will be removed
 #Receives the $wantedpartitions setting because it will be used to check whether a device is a CIBU-device
 sub choose_device {
-    my $blockdevices = find_available_block_devices(shift);
+    my $wantedpartitions = shift;
+    my $blockdevices = find_available_block_devices($wantedpartitions);
     my @sorteddevices = sort keys %$blockdevices;
     my @options = ("Cancel");
     foreach(@sorteddevices) {
