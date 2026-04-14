@@ -275,9 +275,9 @@ sub mount {
     say "Mounting $partition...";
     my $dir = `mktemp -d ${tmpmountpointprefix}XXXXXX`; chomp($dir);
     myerror "Failed to create temporary directory for mounting $partition." if($? != 0);
-    mysystem("mount $part $dir");
-    say "$partition is now mounted on $mountpoint";
-    return $mountpoint;
+    mysystem("mount $partition $dir");
+    say "$partition is now mounted on $dir.";
+    return $dir;
 }
 
 #Checks if the grub on the system has support for BIOS and/or EFI boot mode by checking if the directories /usr/lib/grub/i386-pc and /usr/lib/grub/x86_64-efi exist.
