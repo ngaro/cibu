@@ -31,25 +31,16 @@ Editing booting parameters before booting (you only see this if you press 'e' wh
 
 Differences from [GLIM](https://github.com/thias/glim)
 --------------
-
-* The partition layout is different to support ISO files > 4GB
-
-* The ISO folder has been moved from `boot/iso/` on the first to just `isos/` on the second partition
-
-* Partitioning is done for you.
-
-* Some questions and checks have been removed; others have been added
-
-* The code has been rewritten in (well-documented) Perl.
-
-* The "do-whatever-you-want" licensing has been changed to ensure forks must grant the same rights to everyone.
+See [CHANGELOG.md](CHANGELOG.md) for full info. Most important things: Large isos are supported and partitioning is done for you.
 
 Installation
 ------------
 
 * Make sure you have `sudo` and `perl` on your system. _(Most popular Linux distros have them preinstalled)._
 
-* Clone this repo, run `./cibu`, and answer the questions.<br>
+* Download [the zipfile with CIDU's code](https://github.com/ngaro/cibu/archive/refs/heads/perl.zip) and extract it somewhere.
+
+* Run `./cibu` in the extracted directory and follow the instructions.
 CIBU uses some external tools to build the stick, so it will check for their presence.<br>
 If you are missing any _(you probably won't)_, install them.<br>
 Your distribution's package manager will almost certainly provide them.
