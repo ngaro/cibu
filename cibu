@@ -190,7 +190,7 @@ sub create_partitions {
 #Labels and formats the partitions on the device given as 1st argument. The 2nd argument is the wanted partition layout (see the Settings-section).
 #Returns a arrayref with the paths of the first and second partition
 sub name_and_format_partitions {
-    my (@device, $wantedpartitions) = @_;
+    my ($device, $wantedpartitions) = @_;
     my $cibupartname = $wantedpartitions->[0]->{label};
     my $isopartname = $wantedpartitions->[1]->{label};
     my $biospartname = $wantedpartitions->[2]->{label};
