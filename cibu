@@ -81,7 +81,7 @@ sub is_cibu_device {
 }
 
 
-#Returns a hash with as keys the available block devices and as values what kind of device they are. (For now everything is just 'blockdevice')
+#Returns a hash with as keys the available block devices and as values what kind of device they are. (For now everything that is not a CIBU-device is just called 'blockdevice')
 #Accepts the $wantedpartitions settings as argument to check whether the device is a CIBU-device
 sub find_available_block_devices {
     my $wantedpartitions = shift;
