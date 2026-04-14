@@ -90,11 +90,11 @@ sub find_available_block_devices {
 #When we implement the option to create a disk image file in the future, the check for a block device will be removed
 sub choose_device {
     my $blockdevices = find_available_block_devices();
-    my @devices = ();
-    foreach(sort keys %$blockdevices) {
-      push @devices, "$_ -> $blockdevices->{$_}";
+    my @sorteddevices = sort keys %$blockdevices;
+    my @options = ("Cancel");
+    foreach(@sorteddevices) {
+      push @options, "$_ -> $blockdevices->{$_}";
     }
-    my @options = ("Cancel", @devices);
     print << 'END';
 Choose the number of a blockdevice to overwrite. Choose option 0 to cancel.
 You can also enter the full path. This will be useful IN THE FUTURE if you want to create a disk image file instead of a physical block device.
@@ -106,17 +106,17 @@ END
     }
     say "[$i] Show detailed info of all block devices above first";
     print "Choose a optionnumber or enter a path: "; my $answer = <STDIN>; chomp $answer;
-    if($answer =~ /^\s*0\s*$/) {
+    if($answer =~ /^\s*0\s*$/) {  #The first option is not part of @devices
         say "Script cancelled by user."; exit(1);
-    } elsif($answer =~ /^\s*$i\s*$/) {
-        for(my $j=1; $j<$i; $j++) {
-          say "Detailed info for $options[$j]:";
-          mysystem("fdisk -l $options[$j]");
+    } elsif($answer =~ /^\s*$i\s*$/) {  #Neither is the last
+        foreach(@sorteddevices) {
+          say "Detailed info for $blockdevices->{$_} '$_' :";
+          mysystem("fdisk -l $_");
           say "";
         }
         return choose_device();
     } elsif($answer =~ /^\s*(\d+)\s*$/ && exists $options[$1]) {
-        return $options[$1];
+      return $sorteddevices[$1-1]; #The first option is not part of @devices, so we have to subtract 1 from the index
     } elsif($answer =~ /^\s*(\S.*?)\s*$/ && -b $1) {
         return $1;
     } else {
