@@ -72,20 +72,46 @@ sub run_as_root {
     return $user;
 }
 
-#Finds the available block devices and return them as a list. Blockdevices that are partitions of other blockdevices will not be included in the list.
+#Checks if the given device is a CIBU device by using lsblk to check if the first partition has the label that the first partition of CIBU-device should have (according to $wantedpartitions).
+#Accepts the $wantedpartitions settings as argument to check whether the device is a CIBU-device.
+sub is_cibu_device {
+  my ($device, $wanted_partitions) = @_;
+  my @labels = split("\n", `lsblk -o label -pn $device`);
+  if(exists $labels[1] && $labels[1] eq $wanted_partitions->[0]->{label}) { return 1; } else { return undef; } #$label[1] because $labels[0] is $device itself
+}
+
+
+#Returns a hash with as keys the available block devices and as values what kind of device they are. (For now everything that is not a CIBU-device is just called 'blockdevice')
+#Accepts the $wantedpartitions settings as argument to check whether the device is a CIBU-device
 sub find_available_block_devices {
+    my $wantedpartitions = shift;
     my @blockdevices = `lsblk -o name -pn --nodeps`;
     chomp @blockdevices;
     @blockdevices = grep { !/\/sr\d+$/ } @blockdevices; #Filter out CD-ROM drives
-    return \@blockdevices;
+    my $devicetypes = {};
+    foreach(@blockdevices) {
+      if(is_cibu_device($_,$wantedpartitions)) {
+        $devicetypes->{$_} = 'CIBU-device';
+      } else {
+        $devicetypes->{$_} = 'blockdevice';
+      }
+    }
+    return $devicetypes;
 }
 
 #Asks the user to choose a block device from a list of available block devices or to enter a path to a block device. Returns the chosen block device.
 #If the user enters 0 or a path that is not a block device the script will be cancelled with an error message.
 #The last number will be used to show detailed info of all block devices and afterwards this function will be called again.
 #When we implement the option to create a disk image file in the future, the check for a block device will be removed
+#Receives the $wantedpartitions setting because it will be used to check whether a device is a CIBU-device
 sub choose_device {
-    my @options = ("Cancel", @{find_available_block_devices()});
+    my $wantedpartitions = shift;
+    my $blockdevices = find_available_block_devices($wantedpartitions);
+    my @sorteddevices = sort keys %$blockdevices;
+    my @options = ("Cancel");
+    foreach(@sorteddevices) {
+      push @options, "$_ -> $blockdevices->{$_}";
+    }
     print << 'END';
 Choose the number of a blockdevice to overwrite. Choose option 0 to cancel.
 You can also enter the full path. This will be useful IN THE FUTURE if you want to create a disk image file instead of a physical block device.
@@ -97,17 +123,17 @@ END
     }
     say "[$i] Show detailed info of all block devices above first";
     print "Choose a optionnumber or enter a path: "; my $answer = <STDIN>; chomp $answer;
-    if($answer =~ /^\s*0\s*$/) {
+    if($answer =~ /^\s*0\s*$/) {  #The first option is not part of @devices
         say "Script cancelled by user."; exit(1);
-    } elsif($answer =~ /^\s*$i\s*$/) {
-        for(my $j=1; $j<$i; $j++) {
-          say "Detailed info for $options[$j]:";
-          mysystem("fdisk -l $options[$j]");
+    } elsif($answer =~ /^\s*$i\s*$/) {  #Neither is the last
+        foreach(@sorteddevices) {
+          say "Detailed info for $blockdevices->{$_} '$_' :";
+          mysystem("fdisk -l $_");
           say "";
         }
-        return choose_device();
+        return choose_device($wantedpartitions);
     } elsif($answer =~ /^\s*(\d+)\s*$/ && exists $options[$1]) {
-        return $options[$1];
+      return $sorteddevices[$1-1]; #The first option is not part of @devices, so we have to subtract 1 from the index
     } elsif($answer =~ /^\s*(\S.*?)\s*$/ && -b $1) {
         return $1;
     } else {
@@ -269,20 +295,15 @@ sub umount {
     say "All specified partitions are now unmounted.";
 }
 
-#Mounts the partitions passed as arguments on temporary directories. Returns a hash with the partition as key and the temporary directory it is mounted on as value.
+#Mount the partition passed as an argument on a temporary directory and returns the absolute path of the mountpoint.
 sub mount {
-    my @partitions = @_;
-    my $mounts= {};
-    say "Mounting the following partitions: @partitions";
-    foreach my $part (@partitions) {
-      my $dir = `mktemp -d ${tmpmountpointprefix}XXXXXX`; chomp($dir);
-      myerror "Failed to create temporary directory for mounting $part" if $? != 0;
-      say "Mounting $part on temporary directory $dir";
-      mysystem("mount $part $dir");
-      $mounts->{$part} = $dir;
-    }
-    say "All specified partitions are now mounted.";
-    return $mounts;
+    my $partition = shift;
+    say "Mounting $partition...";
+    my $dir = `mktemp -d ${tmpmountpointprefix}XXXXXX`; chomp($dir);
+    myerror "Failed to create temporary directory for mounting $partition." if($? != 0);
+    mysystem("mount $partition $dir");
+    say "$partition is now mounted on $dir.";
+    return $dir;
 }
 
 #Checks if the grub on the system has support for BIOS and/or EFI boot mode by checking if the directories /usr/lib/grub/i386-pc and /usr/lib/grub/x86_64-efi exist.
@@ -337,21 +358,25 @@ sub copy_grub_config {
 }
 
 #Creates the directory layout for the ISO files. It is expected that:
-# - The 1st argument is the absolute path of the mounted second partition of the device
-# - The 2nd argument is the absolute path of the grub2 config directory that is located in the same directory as this script, which contains the distro config files that will be used to create the directories for the ISO files.
-#   The distro config files in the grub2 config directory should be named in the format 'inc-<distroname>.cfg'.
+# - The 1st argument is the partition that will be used for the ISO files. It is expected that this partition already has the correct label and (empty) filesystem.
+# - The 2nd argument is the absolute path of the grub config directory on the first partition of the device. It is expected that CIBU is installed and that it's mounted
+#   The distro config files in the grub2 config directory there should be named in the format 'inc-<distroname>.cfg'.
 # - The 3rd argument is the name of the directory that will be created on the second partition to put the ISO files in.
 # - The 4rd argument is a hash with the uid and gid of the user who invoked sudo
 # The result will be a directory named $isosdir with for each <distroname> a subdir. And they will all get the UID and GID of the user who invoked sudo.
+# Returns the mount point of the partition with the isos
 sub create_isos_dirs {
-  my ($isosmnt, $grubconfigdir, $isosdir, $user) = @_;
+  my ($isospart, $grubconfigdir, $isosdir, $user) = @_;
   say "Creating the directory layout for the partition for ISO files...";
+  say ""; umount($isospart); #Just in case it's automounted
+  my $isosmnt = mount($isospart);
   for my $distroconfig (glob("$grubconfigdir/*")) {
     $distroconfig =~ /^.*\/inc-(\S+)\.cfg$/ or next;
     mysystem("mkdir -p '$isosmnt/$isosdir/$1'");
   }
   mysystem("chown -R $user->{uid}:$user->{gid} '$isosmnt/$isosdir'");
   say "Directory layout for ISO files created. (A dir name '$isosdir' with subdirs for each distro where you can put the ISO files for that distro)";
+  return $isosmnt;
 }
 
 #Create a new cibu device but don't install the cibu system on it yet.
@@ -360,7 +385,7 @@ sub create_isos_dirs {
 sub create_new_device {
     my ($wantedpartitions, $ddlength) = @_;
     say "Preparing a device for $name creation...";
-    say ""; my $device = choose_device();
+    say ""; my $device = choose_device($wantedpartitions);
     say ""; check_if_mounted($device);
     say ""; deviceinfo_and_confirmation($device);
     say ""; wipe_and_create_table($device, $ddlength);
@@ -371,20 +396,19 @@ sub create_new_device {
 }
 
 #Installs cibu on a device that already has the correct partition table.
-#First argument is the device, 2nd argument the cibu partition, 3rd argument the isos partition, 4th argument the isos dir, 5th argument is a hash with uid and gid of of user who should own the isos dir
-#It is expected that the partitions already have the correct labels and (empty) filesystems. Returns a arrayref with the mountpoints of the partition with the cibu system and the partition for the ISO files, in that order.
+#First argument is the device, 2nd argument the cibu partition
+#It is expected that the cibu partition already has the correct label and (empty) filesystem. Returns a arrayref with the mountpoint of the cibu partition and the path of the config dir there
 sub install_cibu {
-    my ($device, $cibupart, $isopart, $isosdir, $user) = @_;
+    my ($device, $cibupart) = @_;
     say "Installing $name on the device...";
     say ""; my $grubversion = grub_grub2_choice();
     say ""; my $grubconfigdir = find_and_check_grub_dir();
-    say ""; umount($cibupart, $isopart); #Just in case they are automounted
-    say ""; my $mounts = mount($cibupart, $isopart);
+    say ""; umount($cibupart); #Just in case it's automounted
+    say ""; my $cibumnt = mount($cibupart);
     say ""; my $support = check_bios_efi_support();
-    say ""; install_grub($grubversion->{installer}, $support, $mounts->{$cibupart}, $device);
-    say ""; copy_grub_config($grubconfigdir, "$mounts->{$cibupart}/boot/$grubversion->{configdir}");
-    say ""; create_isos_dirs($mounts->{$isopart}, $grubconfigdir, $isosdir, $user);
-    return [$mounts->{$cibupart}, $mounts->{$isopart}];
+    say ""; install_grub($grubversion->{installer}, $support, $cibumnt, $device);
+    say ""; copy_grub_config($grubconfigdir, "$cibumnt/boot/$grubversion->{configdir}");
+    return [$cibumnt, $grubconfigdir];
 }
 
 #Settings (Don't mess around with them, the variablenames might change in the future)
@@ -398,7 +422,8 @@ showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 say ""; my ($device, $cibupart, $isopart) = @{create_new_device($wantedpartitions, $ddlength)};
-say ""; my ($cibumnt, $isosmnt) = @{install_cibu($device, $cibupart, $isopart, $isosdir, $user)};
+say ""; my ($cibumnt, $grubconfigdir) = @{install_cibu($device, $cibupart)};
+say ""; my $isosmnt = create_isos_dirs($isopart, $grubconfigdir, $isosdir, $user);
 #Finishing up
 say ""; umount($cibupart, $isopart);
 say ""; mysystem("rm -rf '$cibumnt' '$isosmnt'"); #Remove the temporary mountpoints
