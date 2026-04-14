@@ -1,5 +1,5 @@
 You might sometimes see a iso here marked "Failed" being replaced by a slightly newer version marked "Pass".
-This means that CiBu was updated in such a way that both the newer and the older version are fixed.
+This means that CIBU was updated in such a way that both the newer and the older version are fixed.
 
 | Distro | File | Result | Date | Tester | Notes |
 | --- | --- | --- | --- | --- | --- |

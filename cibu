@@ -3,7 +3,7 @@ use strict; use warnings; use v5.30;
 use FindBin;
 
 #Global variables that you probably don't want to change. They are here to prevent hardcoding
-my $name = "CiBu";
+my $name = "CIBU";
 my $tmpmountpointprefix = "/tmp/$name-mnt-";
 
 
