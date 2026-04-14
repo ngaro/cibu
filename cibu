@@ -72,14 +72,27 @@ sub run_as_root {
     return $user;
 }
 
-#Returs a hash with as keys the available block devices and as values what kind of device they are. (For now everything is just 'blockdevice')
+#Checks if the given device is a CIBU device by using lsblk to check if the first partition has the label that the first partition of CIBU-device should have (according to $wantedpartitions).
+#Returns 1 if a partition with the correct label is found, otherwise returns undef.
+sub is_cibu_device {
+  my $device = shift;
+  my @labels = split("\n", `lsblk -o label -pn $device`);
+  if(exists $labels[1] && $labels[1] eq $wantedpartitions->[0]->{label}) { return 1; } else { return undef; } #$label[1] because $labels[0] is $device itself
+}
+
+
+#Returns a hash with as keys the available block devices and as values what kind of device they are. (For now everything is just 'blockdevice')
 sub find_available_block_devices {
     my @blockdevices = `lsblk -o name -pn --nodeps`;
     chomp @blockdevices;
     @blockdevices = grep { !/\/sr\d+$/ } @blockdevices; #Filter out CD-ROM drives
     my $devicetypes = {};
     foreach(@blockdevices) {
-      $devicetypes->{$_} = 'blockdevice';
+      if(is_cibu_device($_)) {
+        $devicetypes->{$_} = 'CIBU-device';
+      } else {
+        $devicetypes->{$_} = 'blockdevice';
+      }
     }
     return $devicetypes;
 }
