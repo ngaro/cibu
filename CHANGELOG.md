@@ -5,12 +5,15 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
-## Version 0.2.0 - Work in progress, changes might change and might not be implemented completely yet
+## Version 0.2.0 - Work in progress, not released yet. Only for really brave testers...
 
-### Changes worked on right now
+### Changes
 
-- Show more info about what the found devices are to help users choose. State: To test
-- Make it possible to upgrade/reinstall CIDU without wiping the whole device (forcing you to manually copy all your iso's back). State: Next thing to work on
+- Shows more info about the found devices to help users choose.
+
+### Planned for this version (These plans might change)
+
+- Make it possible to upgrade/reinstall CIDU without wiping the whole device (forcing you to manually copy all your iso's back).
   
 ## Version 0.1.0 - Date of release: 2026-04-14 epoch time 1776196058
 
