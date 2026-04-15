@@ -154,7 +154,8 @@ END
         show_info_about_device($blockdevices->{$_}) foreach(@sorteddevices);
         return choose_device($wantedpartitions);
     } elsif($answer =~ /^\s*(\d+)\s*$/ && exists $options[$1]) {
-      return $sorteddevices[$1-1]; #The first option is not part of @devices, so we have to subtract 1 from the index
+        deviceinfo_and_confirmation($blockdevices->{$sorteddevices[$1-1]}); # -1 because the devices start counting at 1 in the options
+        return $sorteddevices[$1-1];
     } elsif($answer =~ /^\s*(\S.*?)\s*$/ && -b $1) {
         return $1;
     } else {
@@ -183,7 +184,7 @@ END
     say "No partitions on '$device' are mounted.";
 }
 
-#Prints some information about the given device, and asks the user to confirm that they want to continue with this device. If the user doesn't confirm, the script will be cancelled with an error message.
+#Prints some information about the given device (as hash as described in show_info_about_device) and asks the user to confirm
 sub deviceinfo_and_confirmation {
     my $device = shift;
     say "You have chosen to overwrite '$device', here is some information about it:";
@@ -408,7 +409,6 @@ sub create_new_device {
     say "Preparing a device for $name creation...";
     say ""; my $device = choose_device($wantedpartitions);
     say ""; check_if_mounted($device);
-    say ""; deviceinfo_and_confirmation($device);
     say ""; wipe_and_create_table($device, $ddlength);
     say ""; create_partitions($device, $wantedpartitions);
     say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device, $wantedpartitions)};
