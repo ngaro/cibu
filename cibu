@@ -81,22 +81,47 @@ sub is_cibu_device {
 }
 
 
-#Returns a hash with as keys the available block devices and as values what kind of device they are. (For now everything that is not a CIBU-device is just called 'blockdevice')
+#Creates a description key for a hash as described in show_info_about_device and returns the description
+sub create_device_description {
+    my $deviceinfo = shift;
+    my $description = $deviceinfo->{removable} ? "Removable " : "Non-removable ";
+    $description .= $deviceinfo->{size} . " ";
+    if($deviceinfo->{cibu}) {
+      $description .= "device with a CIBU installation (that I can reinstall/update) ";
+    } else {
+      $description .= "device without CIBU ";
+    }
+    if($deviceinfo->{model} ne "") {
+      $description .= "($deviceinfo->{model})";
+    }
+    return $description;
+}
+
+#Returns a hash with as keys the available block devices and as values hashes as described in show_info_about_device
 #Accepts the $wantedpartitions settings as argument to check whether the device is a CIBU-device
 sub find_available_block_devices {
     my $wantedpartitions = shift;
-    my @blockdevices = `lsblk -o name -pn --nodeps`;
-    chomp @blockdevices;
-    @blockdevices = grep { !/\/sr\d+$/ } @blockdevices; #Filter out CD-ROM drives
+    my @blockdevices = split("\n", `lsblk -pndo NAME,RM,SIZE,MODEL`);
     my $devicetypes = {};
     foreach(@blockdevices) {
-      if(is_cibu_device($_,$wantedpartitions)) {
-        $devicetypes->{$_} = 'CIBU-device';
-      } else {
-        $devicetypes->{$_} = 'blockdevice';
+      if(/^(\S+)\s+(\d)\s+(\S+)\s+(.*)\s*$/) {
+        my $path = $1; my $removable = $2; my $size = $3; my $model = $4;
+        next if($path =~ /^\/dev\/sr\d+$/);
+        $devicetypes->{$path} = { path => $path, removable => $removable, size => $size, model => $model, cibu => is_cibu_device($path, $wantedpartitions) };
+        $devicetypes->{$path}->{description} = create_device_description($devicetypes->{$path});
       }
     }
     return $devicetypes;
+}
+
+#Accepts a hash with info about the device and prints the description and the output of 'fdisk -l' for the device.
+#The hash has the following keys: 'path', 'removable' (1 if it is), 'size' (human readable), 'model', 'cibu' (1 if it is a CIBU-device) and 'description'
+sub show_info_about_device {
+    my $device = shift;
+    say "";
+    say "Device '$device->{path}' is a $device->{description}.";
+    say "The partition layout according to fdisk is :";
+    mysystem("fdisk -l $device->{path}");
 }
 
 #Asks the user to choose a block device from a list of available block devices or to enter a path to a block device. Returns the chosen block device.
@@ -110,7 +135,7 @@ sub choose_device {
     my @sorteddevices = sort keys %$blockdevices;
     my @options = ("Cancel");
     foreach(@sorteddevices) {
-      push @options, "$_ -> $blockdevices->{$_}";
+      push @options, "$_ -> $blockdevices->{$_}->{description}";
     }
     print << 'END';
 Choose the number of a blockdevice to overwrite. Choose option 0 to cancel.
@@ -126,14 +151,11 @@ END
     if($answer =~ /^\s*0\s*$/) {  #The first option is not part of @devices
         say "Script cancelled by user."; exit(1);
     } elsif($answer =~ /^\s*$i\s*$/) {  #Neither is the last
-        foreach(@sorteddevices) {
-          say "Detailed info for $blockdevices->{$_} '$_' :";
-          mysystem("fdisk -l $_");
-          say "";
-        }
+        show_info_about_device($blockdevices->{$_}) foreach(@sorteddevices);
         return choose_device($wantedpartitions);
     } elsif($answer =~ /^\s*(\d+)\s*$/ && exists $options[$1]) {
-      return $sorteddevices[$1-1]; #The first option is not part of @devices, so we have to subtract 1 from the index
+        deviceinfo_and_confirmation($blockdevices->{$sorteddevices[$1-1]}); # -1 because the devices start counting at 1 in the options
+        return $sorteddevices[$1-1];
     } elsif($answer =~ /^\s*(\S.*?)\s*$/ && -b $1) {
         return $1;
     } else {
@@ -162,11 +184,11 @@ END
     say "No partitions on '$device' are mounted.";
 }
 
-#Prints some information about the given device, and asks the user to confirm that they want to continue with this device. If the user doesn't confirm, the script will be cancelled with an error message.
+#Prints some information about the given device (as hash as described in show_info_about_device) and asks the user to confirm
 sub deviceinfo_and_confirmation {
     my $device = shift;
-    say "You have chosen to overwrite '$device'. Here is some more info about it (found with 'fdisk -l $device'):";
-    system("fdisk -l $device");
+    say "You have chosen to overwrite '$device->{path}', here is some information about it:";
+    show_info_about_device($device);
     ask_for_confirmation("\nIf you are sure you have chosen the correct device, then please enter 'yes' to confirm and continue, otherwise enter 'no' to cancel: ");
 }
 
@@ -387,7 +409,6 @@ sub create_new_device {
     say "Preparing a device for $name creation...";
     say ""; my $device = choose_device($wantedpartitions);
     say ""; check_if_mounted($device);
-    say ""; deviceinfo_and_confirmation($device);
     say ""; wipe_and_create_table($device, $ddlength);
     say ""; create_partitions($device, $wantedpartitions);
     say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device, $wantedpartitions)};
