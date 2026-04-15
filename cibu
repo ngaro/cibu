@@ -105,7 +105,7 @@ sub find_available_block_devices {
     my $devicetypes = {};
     foreach(@blockdevices) {
       if(/^(\S+)\s+(\d)\s+(\S+)\s+(.*)\s*$/) {
-        $devicetypes->{$1} = { removable => $2, size => $3, model => $4, cibu => is_cibu_device($1, $wantedpartitions) };
+        $devicetypes->{$1} = { path => $1, removable => $2, size => $3, model => $4, cibu => is_cibu_device($1, $wantedpartitions) };
         $devicetypes->{$1}->{description} = create_device_description($devicetypes->{$1});
       }
     }
@@ -113,13 +113,13 @@ sub find_available_block_devices {
 }
 
 #Accepts a hash with info about the device and prints the description and the output of 'fdisk -l' for the device.
-#The hash has the following keys: 'removable' (1 if it is), 'size' (human readable), 'model', 'cibu' (1 if it is a CIBU-device) and 'description'
+#The hash has the following keys: 'path', 'removable' (1 if it is), 'size' (human readable), 'model', 'cibu' (1 if it is a CIBU-device) and 'description'
 sub show_info_about_device {
     my $device = shift;
     say "";
-    say "Device '$device' is a $device->{description}.";
+    say "Device '$device->{path}' is a $device->{description}.";
     say "The partition layout according to fdisk is :";
-    mysystem("fdisk -l $device");
+    mysystem("fdisk -l $device->{path}");
 }
 
 #Asks the user to choose a block device from a list of available block devices or to enter a path to a block device. Returns the chosen block device.
