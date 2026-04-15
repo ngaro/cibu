@@ -105,8 +105,10 @@ sub find_available_block_devices {
     my $devicetypes = {};
     foreach(@blockdevices) {
       if(/^(\S+)\s+(\d)\s+(\S+)\s+(.*)\s*$/) {
-        $devicetypes->{$1} = { path => $1, removable => $2, size => $3, model => $4, cibu => is_cibu_device($1, $wantedpartitions) };
-        $devicetypes->{$1}->{description} = create_device_description($devicetypes->{$1});
+        my $path = $1; my $removable = $2; my $size = $3; my $model = $4;
+        next if($path =~ /^\/dev\/sr\d+$/);
+        $devicetypes->{$path} = { path => $path, removable => $removable, size => $size, model => $model, cibu => is_cibu_device($path, $wantedpartitions) };
+        $devicetypes->{$path}->{description} = create_device_description($devicetypes->{$path});
       }
     }
     return $devicetypes;
