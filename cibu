@@ -87,7 +87,7 @@ sub create_device_description {
     my $description = $deviceinfo->{removable} ? "Removable " : "Non-removable ";
     $description .= $deviceinfo->{size} . " ";
     if($deviceinfo->{cibu}) {
-      $description .= "CIBU-device ";
+      $description .= "device with a CIBU installation (that I can reinstall/update) ";
     } else {
       $description .= "device without CIBU ";
     }
