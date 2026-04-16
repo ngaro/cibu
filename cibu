@@ -235,14 +235,14 @@ sub create_partitions {
     say "The 3 partitions needed by $name have been created on '$device'.";
 }
 
-#Formats $device according to $wantpartentry (it's entry in $wantedpartitions)
+#Formats $partition according to $wantpartentry (it's entry in $wantedpartitions)
 sub mkfs {
-  my ($device, $wantpartentry) = @_;
-  say "Formatting $device as $wantpartentry->{label}";
+  my ($partition, $wantpartentry) = @_;
+  say "Formatting $partition as $wantpartentry->{label}";
   my $mkfscmd = $wantpartentry->{mkfs};
   $mkfscmd=~s/WANTEDLABEL/$wantpartentry->{label}/;
-  $mkfscmd=~s/PARTPATH/$device/;
-  mysystem("Partition $wantpartentry->{label} has been formatted");
+  $mkfscmd=~s/PARTPATH/$partition/;
+  mysystem("Partition $partition has been formatted as $wantpartentry->{label}");
 }
 
 #Labels and formats the partitions on the device given as 1st argument. The 2nd argument is the wanted partition layout (see the Settings-section).
@@ -457,9 +457,7 @@ sub create_device_if_wanted {
     say ""; return create_new_device($device, $wantedpartitions, $ddlength);
   }
   my [$cibupart, $isopart] = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
-  #TODO the 3 lines are also done in name_and_format_partitions(), put them in a seperate function
-  my $cibupartname = $wantedpartitions->[0]->{label};
-  mysystem("mkfs.fat -I -F 32 -n $cibupartname $cibupart"); # Format the first partition as FAT32, and set its label
+  mkfs($cibupart, $wantedpartitions->[0]); # Format the first partition as FAT32, and set its label
   mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
   return [$cibupart, $isopart];
 }
