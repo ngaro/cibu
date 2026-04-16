@@ -403,7 +403,7 @@ sub create_isos_dirs {
 
 #Create a new cibu device but don't install the cibu system on it yet.
 #$wantedpartitions is the partition layout (see the Settings-section), $ddlength is the length (as dd options) that will be wiped with dd in the beginning of all old partitions
-#Returns a arrayref with the path of the device, the path of the partition with the cibu system and the path of the partition for the ISO files, in that order.
+#Returns a arrayref with the path of the partition with the cibu system and the path of the partition for the ISO files.
 sub create_new_device {
     my ($device, $wantedpartitions, $ddlength) = @_;
     say "Preparing a device for $name creation...";
@@ -431,6 +431,29 @@ sub install_cibu {
     return [$cibumnt, $grubconfigdir];
 }
 
+#If $device is not a $cibudevice, prepares it using create_new_device(). (see info there about the arguments)
+#If it is, it just formats the CIBUSYS pratition unless it's asked for a full reinstall in which case it also calls create_new_device()
+#In both case an arrayref with the paths of the partition of the cibusystem and that of the one with the iso files is returned
+sub create_device_if_wanted {
+  my ($device, $wantedpartitions, $ddlength) = @_;
+  my $createdevice = 1;
+  if(is_cibu_device($device, $wantedpartitions)) {
+    say "The device you have chosen already has a $name installation on it. You can choose to wipe device completely or just do a reinstall/update";
+    say "If you choose to skip wiping, your partition with the ISO files will be kept intact";
+    print "Enter 'yes' to reinstall/update the $name system on the first partition so that you keep the partition with the ISO files intact: ";
+    $createdevice = undef if(<STDIN> =~ /^\s*y(es)?\s*$/i);
+  }
+  if($createdevice) {
+    say ""; return create_new_device($device, $wantedpartitions, $ddlength);
+  }
+  my [$cibupart, $isopart] = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
+  #TODO the 3 lines are also done in name_and_format_partitions(), put them in a seperate function
+  my $cibupartname = $wantedpartitions->[0]->{label};
+  mysystem("mkfs.fat -I -F 32 -n $cibupartname $cibupart"); # Format the first partition as FAT32, and set its label
+  mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
+  return [$cibupart, $isopart];
+}
+
 #Settings (Don't mess around with them, the variablenames might change in the future)
 my $wantedpartitions = [ { label => 'CIBUSYS', size => '100M'}, { label => 'ISOS'}, { label => 'BIOS Boot', size => '1M'} ];    #The 2nd partition has size undefined because it takes up remaining diskspace
 my $isosdir = 'isos';   #Don't change this because configfiles in the grub2 dir depend on this name
@@ -442,19 +465,7 @@ showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 say ""; my $device = choose_device($wantedpartitions);
-my $wipedevice = 1;
-if(is_cibu_device($device, $wantedpartitions)) {
-  say "The device you have chosen already has a $name installation on it. You can choose to wipe device completely or just do a reinstall/update";
-  say "If you choose to skip wiping, your partition with the ISO files will be kept intact";
-  print "Enter 'yes' to reinstall/update the $name system on the first partition so that you keep the partition with the ISO files intact: ";
-  $wipedevice = undef if(<STDIN> =~ /^\s*y(es)?\s*$/i);
-}
-if($wipedevice) {
-  say ""; my ($cibupart, $isopart) = @{create_new_device($device, $wantedpartitions, $ddlength)};
-}
-#TODO
-# - Make sure that the CIBUSYS partition is formatted in install_cibu() instead of in create_new_device()
-# - Set $cibupart and $isopart also when create_new_device() is not called
+say ""; my ($cibupart, $isopart) = @{create_device_if_wanted($device)};
 say ""; my ($cibumnt, $grubconfigdir) = @{install_cibu($device, $cibupart)};
 say ""; my $isosmnt = create_isos_dirs($isopart, $grubconfigdir, $isosdir, $user);
 #Finishing up
