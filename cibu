@@ -250,8 +250,8 @@ sub name_and_format_partitions {
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
     say "Naming the partions on '$device' is done. Now formatting the partitions...";
     my ($cibupart, $isopart) = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
-    my $cibumkfs = $wantedpartitions->[0]->{mkfs}; $cibumkfs =~ s/WANTEDLABEL/$cibupartname/g; $cibumkfs =~ s/PARTNAME/$cibupart/g;
-    my $isomkfs = $wantedpartitions->[1]->{mkfs}; $isomkfs =~ s/WANTEDLABEL/$isopartname/g; $isomkfs =~ s/PARTNAME/$isopart/g;
+    my $cibumkfs = $wantedpartitions->[0]->{mkfs}; $cibumkfs =~ s/WANTEDLABEL/$cibupartname/g; $cibumkfs =~ s/PARTPATH/$cibupart/g;
+    my $isomkfs = $wantedpartitions->[1]->{mkfs}; $isomkfs =~ s/WANTEDLABEL/$isopartname/g; $isomkfs =~ s/PARTPATH/$isopart/g;
     mysystem($cibumkfs);
     mysystem($isomkfs);
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
@@ -458,8 +458,8 @@ sub create_device_if_wanted {
 
 #Settings (Don't mess around with them, the variablenames might change in the future)
 my $wantedpartitions = [
-  { label => 'CIBUSYS', size => '100M', mkfs => 'mkfs.fat -I -F 32 -n WANTEDLABEL PARTNAME'},
-  { label => 'ISOS', mkfs => 'mkfs.ext4 -F -L WANTEDLABEL PARTNAME'},
+  { label => 'CIBUSYS', size => '100M', mkfs => 'mkfs.fat -I -F 32 -n WANTEDLABEL PARTPATH'},
+  { label => 'ISOS', mkfs => 'mkfs.ext4 -F -L WANTEDLABEL PARTPATH'},
   { label => 'BIOS Boot', size => '1M'} ];    #The 2nd partition has size and mkfs undefined because it takes up remaining diskspace and grub will arrange the formatting
 my $isosdir = 'isos';   #Don't change this because configfiles in the grub2 dir depend on this name
 my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
