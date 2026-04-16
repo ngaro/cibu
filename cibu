@@ -463,6 +463,7 @@ sub create_device_if_wanted {
 }
 
 #Settings (Don't mess around with them, the variablenames might change in the future)
+#WANTEDLABEL and PARTPATH in the mkfs entries will be replaced by the actual label and partition path when the mkfs function is called
 my $wantedpartitions = [
   { label => 'CIBUSYS', size => '100M', mkfs => 'mkfs.fat -I -F 32 -n WANTEDLABEL PARTPATH'},
   { label => 'ISOS', mkfs => 'mkfs.ext4 -F -L WANTEDLABEL PARTPATH'}, #size is undefined because we want to use the remaining space on the device for this partition
