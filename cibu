@@ -459,8 +459,8 @@ sub create_device_if_wanted {
 #Settings (Don't mess around with them, the variablenames might change in the future)
 my $wantedpartitions = [
   { label => 'CIBUSYS', size => '100M', mkfs => 'mkfs.fat -I -F 32 -n WANTEDLABEL PARTPATH'},
-  { label => 'ISOS', mkfs => 'mkfs.ext4 -F -L WANTEDLABEL PARTPATH'},
-  { label => 'BIOS Boot', size => '1M'} ];    #The 2nd partition has size and mkfs undefined because it takes up remaining diskspace and grub will arrange the formatting
+  { label => 'ISOS', mkfs => 'mkfs.ext4 -F -L WANTEDLABEL PARTPATH'}, #size is undefined because we want to use the remaining space on the device for this partition
+  { label => 'BIOS Boot', size => '1M'} ];    #mkfs is undefined because the grub installer will handle this
 my $isosdir = 'isos';   #Don't change this because configfiles in the grub2 dir depend on this name
 my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
 
