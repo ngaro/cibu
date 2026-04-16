@@ -465,7 +465,7 @@ showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
 say ""; my $device = choose_device($wantedpartitions);
-say ""; my ($cibupart, $isopart) = @{create_device_if_wanted($device)};
+say ""; my ($cibupart, $isopart) = @{create_device_if_wanted($device, $wantedpartitions, $ddlength)};
 say ""; my ($cibumnt, $grubconfigdir) = @{install_cibu($device, $cibupart)};
 say ""; my $isosmnt = create_isos_dirs($isopart, $grubconfigdir, $isosdir, $user);
 #Finishing up
