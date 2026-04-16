@@ -10,7 +10,7 @@ All notable changes to this project will be documented in this file
 ### Changes
 
 - Shows more info about the found devices to help users choose.
-- Make it possible to upgrade/reinstall CIDU without wiping the ISOS-partition (forcing you to manually copy all your iso's back).
+- Makes it possible to upgrade/reinstall CIDU without wiping the ISOS-partition (forcing you to manually copy all your iso's back).
 
 ## Version 0.1.0 - Date of release: 2026-04-14 epoch time 1776196058
 
