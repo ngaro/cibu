@@ -240,9 +240,9 @@ sub mkfs {
   my ($partition, $wantpartentry) = @_;
   say "Formatting $partition as $wantpartentry->{label}";
   my $mkfscmd = $wantpartentry->{mkfs};
-  $mkfscmd=~s/WANTEDLABEL/$wantpartentry->{label}/;
-  $mkfscmd=~s/PARTPATH/$partition/;
-  mysystem("Partition $partition has been formatted as $wantpartentry->{label}");
+  $mkfscmd=~s/WANTEDLABEL/$wantpartentry->{label}/; $mkfscmd=~s/PARTPATH/$partition/;
+  mysystem($mkfscmd);
+  say("Partition $partition has been formatted as $wantpartentry->{label}");
 }
 
 #Labels and formats the partitions on the device given as 1st argument. The 2nd argument is the wanted partition layout (see the Settings-section).
