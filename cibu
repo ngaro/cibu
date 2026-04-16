@@ -235,6 +235,16 @@ sub create_partitions {
     say "The 3 partitions needed by $name have been created on '$device'.";
 }
 
+#Formats $device according to $wantpartentry (it's entry in $wantedpartitions)
+sub mkfs {
+  my ($device, $wantpartentry) = @_;
+  say "Formatting $device as $wantpartentry->{label}";
+  my $mkfscmd = $wantpartentry->{mkfs};
+  $mkfscmd=~s/WANTEDLABEL/$wantpartentry->{label}/;
+  $mkfscmd=~s/PARTPATH/$device/;
+  mysystem("Partition $wantpartentry->{label} has been formatted");
+}
+
 #Labels and formats the partitions on the device given as 1st argument. The 2nd argument is the wanted partition layout (see the Settings-section).
 #Returns a arrayref with the paths of the first and second partition
 sub name_and_format_partitions {
@@ -250,10 +260,8 @@ sub name_and_format_partitions {
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
     say "Naming the partions on '$device' is done. Now formatting the partitions...";
     my ($cibupart, $isopart) = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
-    my $cibumkfs = $wantedpartitions->[0]->{mkfs}; $cibumkfs =~ s/WANTEDLABEL/$cibupartname/g; $cibumkfs =~ s/PARTPATH/$cibupart/g;
-    my $isomkfs = $wantedpartitions->[1]->{mkfs}; $isomkfs =~ s/WANTEDLABEL/$isopartname/g; $isomkfs =~ s/PARTPATH/$isopart/g;
-    mysystem($cibumkfs);
-    mysystem($isomkfs);
+    mkfs($cibupart, $wantedpartitions->[0]);
+    mkfs($isopart, $wantedpartitions->[1]);
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
     say "The partitions on '$device' have been named and formatted.";
     return [$cibupart, $isopart];
