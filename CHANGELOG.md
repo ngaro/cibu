@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
-## Version 0.2.0 - Work in progress, not released yet. Only for really brave testers...
+## Version 0.2.0 - Date of release: 2026-04-17 epoch time 1776432123
 
 ### Changes
 
