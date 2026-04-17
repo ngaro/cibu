@@ -5,16 +5,13 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
-## Version 0.2.0 - Work in progress, not released yet. Only for really brave testers...
+## Version 0.2.0 - Date of release: 2026-04-17 epoch time 1776432123
 
 ### Changes
 
 - Shows more info about the found devices to help users choose.
+- Makes it possible to upgrade/reinstall CIDU without wiping the ISOS-partition (forcing you to manually copy all your iso's back).
 
-### Planned for this version (These plans might change)
-
-- Make it possible to upgrade/reinstall CIDU without wiping the whole device (forcing you to manually copy all your iso's back).
-  
 ## Version 0.1.0 - Date of release: 2026-04-14 epoch time 1776196058
 
 ### Changes
@@ -41,10 +38,9 @@ All notable changes to this project will be documented in this file
   - Because of ext4 large iso's ( > 4GB ) are now also supported
   - Inner workings of the script are different, but the end result is reasonably similar to a device created with GLIM
 
-### Features that I plan to add in the future
+# Features that I plan to add in the future
 - Add support for booting Windows installer iso's
 - Add support for exFAT to make it possible to add iso's from more operating systems (like Windows) that only support ext4 with 3rd party software
-- Make it possible to upgrade/reinstall CIDU without wiping the whole device (forcing you to manually copy all your iso's back)
 - Make it possible to boot iso's on systems with secure boot enabled
 - Make sure there can't be any dependency problems by adding a Nix flake and/or Docker image
 - Let github build a zip file for each new version

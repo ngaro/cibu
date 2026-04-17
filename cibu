@@ -73,7 +73,7 @@ sub run_as_root {
 }
 
 #Checks if the given device is a CIBU device by using lsblk to check if the first partition has the label that the first partition of CIBU-device should have (according to $wantedpartitions).
-#Accepts the $wantedpartitions settings as argument to check whether the device is a CIBU-device.
+#Accepts the $wantedpartitions settings as argument to check whether the device is a CIBU-device. Returns 1 if the device is a CIBU-device, otherwise returns undef
 sub is_cibu_device {
   my ($device, $wanted_partitions) = @_;
   my @labels = split("\n", `lsblk -o label -pn $device`);
@@ -87,9 +87,9 @@ sub create_device_description {
     my $description = $deviceinfo->{removable} ? "Removable " : "Non-removable ";
     $description .= $deviceinfo->{size} . " ";
     if($deviceinfo->{cibu}) {
-      $description .= "device with a CIBU installation (that I can reinstall/update) ";
+      $description .= "device with a $name installation (that I can reinstall/update) ";
     } else {
-      $description .= "device without CIBU ";
+      $description .= "device without $name ";
     }
     if($deviceinfo->{model} ne "") {
       $description .= "($deviceinfo->{model})";
@@ -137,8 +137,8 @@ sub choose_device {
     foreach(@sorteddevices) {
       push @options, "$_ -> $blockdevices->{$_}->{description}";
     }
-    print << 'END';
-Choose the number of a blockdevice to overwrite. Choose option 0 to cancel.
+    print << "END";
+Choose the number of a blockdevice to install $name on. Choose option 0 to cancel.
 You can also enter the full path. This will be useful IN THE FUTURE if you want to create a disk image file instead of a physical block device.
 (Disk images is a feature that is not yet implemented)
 END
@@ -187,7 +187,7 @@ END
 #Prints some information about the given device (as hash as described in show_info_about_device) and asks the user to confirm
 sub deviceinfo_and_confirmation {
     my $device = shift;
-    say "You have chosen to overwrite '$device->{path}', here is some information about it:";
+    say "You have chosen to install on '$device->{path}', here is some information about it:";
     show_info_about_device($device);
     ask_for_confirmation("\nIf you are sure you have chosen the correct device, then please enter 'yes' to confirm and continue, otherwise enter 'no' to cancel: ");
 }
@@ -235,6 +235,16 @@ sub create_partitions {
     say "The 3 partitions needed by $name have been created on '$device'.";
 }
 
+#Formats $partition according to $wantpartentry (it's entry in $wantedpartitions)
+sub mkfs {
+  my ($partition, $wantpartentry) = @_;
+  say "Formatting $partition as $wantpartentry->{label}";
+  my $mkfscmd = $wantpartentry->{mkfs};
+  $mkfscmd=~s/WANTEDLABEL/$wantpartentry->{label}/; $mkfscmd=~s/PARTPATH/$partition/;
+  mysystem($mkfscmd);
+  say("Partition $partition has been formatted as $wantpartentry->{label}");
+}
+
 #Labels and formats the partitions on the device given as 1st argument. The 2nd argument is the wanted partition layout (see the Settings-section).
 #Returns a arrayref with the paths of the first and second partition
 sub name_and_format_partitions {
@@ -250,8 +260,8 @@ sub name_and_format_partitions {
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition names, before we format them
     say "Naming the partions on '$device' is done. Now formatting the partitions...";
     my ($cibupart, $isopart) = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
-    mysystem("mkfs.fat -I -F 32 -n $cibupartname $cibupart"); # Format the first partition as FAT32, and set its label
-    mysystem("mkfs.ext4 -F -L $isopartname $isopart"); # Format the second partition as ext4, and set its label
+    mkfs($cibupart, $wantedpartitions->[0]);
+    mkfs($isopart, $wantedpartitions->[1]);
     mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
     say "The partitions on '$device' have been named and formatted.";
     return [$cibupart, $isopart];
@@ -402,18 +412,17 @@ sub create_isos_dirs {
 }
 
 #Create a new cibu device but don't install the cibu system on it yet.
-#1st argument is the wanted partition layout (see the Settings-section). 2nd argument is the length (as dd options) that will be wiped with dd in the beginning of all old partitions
-#Returns a arrayref with the path of the device, the path of the partition with the cibu system and the path of the partition for the ISO files, in that order.
+#$wantedpartitions is the partition layout (see the Settings-section), $ddlength is the length (as dd options) that will be wiped with dd in the beginning of all old partitions
+#Returns a arrayref with the path of the partition with the cibu system and the path of the partition for the ISO files.
 sub create_new_device {
-    my ($wantedpartitions, $ddlength) = @_;
+    my ($device, $wantedpartitions, $ddlength) = @_;
     say "Preparing a device for $name creation...";
-    say ""; my $device = choose_device($wantedpartitions);
     say ""; check_if_mounted($device);
     say ""; wipe_and_create_table($device, $ddlength);
     say ""; create_partitions($device, $wantedpartitions);
     say ""; my ($cibupart, $isopart) = @{name_and_format_partitions($device, $wantedpartitions)};
     say "Device '$device' is now ready for $name installation. The partition with the $name system is '$cibupart' and the partition for the ISO files is '$isopart'.";
-    return [$device, $cibupart, $isopart];
+    return [$cibupart, $isopart];
 }
 
 #Installs cibu on a device that already has the correct partition table.
@@ -432,8 +441,33 @@ sub install_cibu {
     return [$cibumnt, $grubconfigdir];
 }
 
+#If $device is not a $cibudevice, prepares it using create_new_device(). (see info there about the arguments)
+#If it is, it just formats the CIBUSYS pratition unless it's asked for a full reinstall in which case it also calls create_new_device()
+#In both case an arrayref with the paths of the partition of the cibusystem and that of the one with the iso files is returned
+sub create_device_if_wanted {
+  my ($device, $wantedpartitions, $ddlength) = @_;
+  my $createdevice = 1;
+  if(is_cibu_device($device, $wantedpartitions)) {
+    say "The device you have chosen already has a $name installation on it. You can choose to wipe device completely or just do a reinstall/update";
+    say "If you choose to skip wiping, your partition with the ISO files will be kept intact";
+    print "Enter 'yes' to reinstall/update the $name system on the first partition so that you keep the partition with the ISO files intact: ";
+    $createdevice = undef if(<STDIN> =~ /^\s*y(es)?\s*$/i);
+  }
+  if($createdevice) {
+    say ""; return create_new_device($device, $wantedpartitions, $ddlength);
+  }
+  my ($cibupart, $isopart) = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
+  mkfs($cibupart, $wantedpartitions->[0]); # Format the first partition as FAT32, and set its label
+  mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
+  return [$cibupart, $isopart];
+}
+
 #Settings (Don't mess around with them, the variablenames might change in the future)
-my $wantedpartitions = [ { label => 'CIBUSYS', size => '100M'}, { label => 'ISOS'}, { label => 'BIOS Boot', size => '1M'} ];    #The 2nd partition has size undefined because it takes up remaining diskspace
+#WANTEDLABEL and PARTPATH in the mkfs entries will be replaced by the actual label and partition path when the mkfs function is called
+my $wantedpartitions = [
+  { label => 'CIBUSYS', size => '100M', mkfs => 'mkfs.fat -I -F 32 -n WANTEDLABEL PARTPATH'},
+  { label => 'ISOS', mkfs => 'mkfs.ext4 -F -L WANTEDLABEL PARTPATH'}, #size is undefined because we want to use the remaining space on the device for this partition
+  { label => 'BIOS Boot', size => '1M'} ];    #mkfs is undefined because the grub installer will handle this
 my $isosdir = 'isos';   #Don't change this because configfiles in the grub2 dir depend on this name
 my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the length that will be wiped in the beginning of the old partitions
 
@@ -442,7 +476,8 @@ my $user = run_as_root();
 showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
 say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
-say ""; my ($device, $cibupart, $isopart) = @{create_new_device($wantedpartitions, $ddlength)};
+say ""; my $device = choose_device($wantedpartitions);
+say ""; my ($cibupart, $isopart) = @{create_device_if_wanted($device, $wantedpartitions, $ddlength)};
 say ""; my ($cibumnt, $grubconfigdir) = @{install_cibu($device, $cibupart)};
 say ""; my $isosmnt = create_isos_dirs($isopart, $grubconfigdir, $isosdir, $user);
 #Finishing up
