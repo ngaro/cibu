@@ -456,7 +456,7 @@ sub create_device_if_wanted {
   if($createdevice) {
     say ""; return create_new_device($device, $wantedpartitions, $ddlength);
   }
-  my [$cibupart, $isopart] = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
+  my ($cibupart, $isopart) = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
   mkfs($cibupart, $wantedpartitions->[0]); # Format the first partition as FAT32, and set its label
   mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes
   return [$cibupart, $isopart];
