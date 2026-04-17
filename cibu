@@ -137,8 +137,8 @@ sub choose_device {
     foreach(@sorteddevices) {
       push @options, "$_ -> $blockdevices->{$_}->{description}";
     }
-    print << 'END';
-Choose the number of a blockdevice to overwrite. Choose option 0 to cancel.
+    print << "END";
+Choose the number of a blockdevice to install $name on. Choose option 0 to cancel.
 You can also enter the full path. This will be useful IN THE FUTURE if you want to create a disk image file instead of a physical block device.
 (Disk images is a feature that is not yet implemented)
 END
@@ -187,7 +187,7 @@ END
 #Prints some information about the given device (as hash as described in show_info_about_device) and asks the user to confirm
 sub deviceinfo_and_confirmation {
     my $device = shift;
-    say "You have chosen to overwrite '$device->{path}', here is some information about it:";
+    say "You have chosen to install on '$device->{path}', here is some information about it:";
     show_info_about_device($device);
     ask_for_confirmation("\nIf you are sure you have chosen the correct device, then please enter 'yes' to confirm and continue, otherwise enter 'no' to cancel: ");
 }
