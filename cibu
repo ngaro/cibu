@@ -127,7 +127,8 @@ sub show_info_about_device {
       say $fdiskoutput;
       return 1;
     } else {
-      say "WARNING: Failed to get a lot of info for $device->{path}. Don't use this blockdevice. This error should tell you why: $fdiskoutput";
+      $fdiskoutput =~ s/^\s*fdisk:\s*(.*)\s*$/$1/;
+      say "WARNING: Failed to get a lot of info for $device->{path}. Don't use this blockdevice. This error should tell you why -> $fdiskoutput";
       return undef;
     }
 }
