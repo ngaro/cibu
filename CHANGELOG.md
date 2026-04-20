@@ -10,6 +10,9 @@ All notable changes to this project will be documented in this file
 
 - Fixes issue https://github.com/ngaro/cibu/issues/3 _(ISOS that depend on the $rootuuid variable now work correctly)_
 
+### Extra tested iso's
+- Mint 22.3 XFCE, SystemRescue 13, MX Linux 25.11
+
 ## Version 0.2.1 - Date of release: 2026-04-20 epoch time 1776707817
 ### Bug fixes
 

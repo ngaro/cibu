@@ -10,10 +10,10 @@
 | LMDE 7 amd64 | `lmde-7-cinnamon-64bit.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | Mint 22.3 Cinnamon amd64 | `linuxmint-22.3-cinnamon-64bit.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | Mint 22.3 XFCE amd64 | `linuxmint-22.3-xfce-64bit.iso` | Pass | v0.2.2 | Nikolas Garofil | No issues found |
-| MX Linux | `MX-25.1_Xfce_ahs_x64.iso` | Pass | v0.2.2 | Nikolas Garofil | Before v0.2.2 this didn't work |
+| MX Linux AHS amd64| `MX-25.1_Xfce_ahs_x64.iso` | Pass | v0.2.2 | Nikolas Garofil | Before v0.2.2 this didn't work |
 | NixOS 25.11 amd64 minimal | `nixos-minimal-25.11.8107.1073dad219cb-x86_64-linux.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | NixOS 25.11 amd64 graphical | `nixos-graphical-25.11.8107.1073dad219cb-x86_64-linux.iso` | Pass | v0.1.0 | Nikolas Garofil | Both Gnome and Plasma are tested |
-| SystemRescue | `systemrescue-13.00-amd64.iso` | Pass | v0.2.2 | Nikolas Garofil | Before v0.2.2 this didn't work |
+| SystemRescue amd64 | `systemrescue-13.00-amd64.iso` | Pass | v0.2.2 | Nikolas Garofil | Before v0.2.2 this didn't work |
 | Tails 6.14.1 amd64 | `tails-amd64-6.14.1.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | Tails 7.0 amd64 | `tails-amd64-7.0.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | Ubuntu 24.04.4 Live Server amd64 | `ubuntu-24.04.4-live-server-amd64.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
