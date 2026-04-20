@@ -5,6 +5,9 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
+## Version 0.2.1 - Date of release: 2026-04-20 epoch time 1776707817
+- Fixes issue https://github.com/ngaro/cibu/issues/2 _(CIBU no longer errors out but just warns with "strange" block devices and allows the user to force their usage )_
+
 ## Version 0.2.0 - Date of release: 2026-04-17 epoch time 1776432123
 
 ### Changes
