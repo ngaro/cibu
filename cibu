@@ -116,12 +116,20 @@ sub find_available_block_devices {
 
 #Accepts a hash with info about the device and prints the description and the output of 'fdisk -l' for the device.
 #The hash has the following keys: 'path', 'removable' (1 if it is), 'size' (human readable), 'model', 'cibu' (1 if it is a CIBU-device) and 'description'
+#Returns undef if fdisk fails, otherwise returns 1.
 sub show_info_about_device {
     my $device = shift;
     say "";
     say "Device '$device->{path}' is a $device->{description}.";
     say "The partition layout according to fdisk is :";
-    mysystem("fdisk -l $device->{path}");
+    my $fdiskoutput = `fdisk -l $device->{path} 2>&1`;
+    if($? == 0) {
+      say $fdiskoutput;
+      return 1;
+    } else {
+      say "WARNING: Failed to get a lot of info for $device->{path}. Don't use this blockdevice. This error should tell you why: $fdiskoutput";
+      return undef;
+    }
 }
 
 #Asks the user to choose a block device from a list of available block devices or to enter a path to a block device. Returns the chosen block device.
@@ -188,7 +196,9 @@ END
 sub deviceinfo_and_confirmation {
     my $device = shift;
     say "You have chosen to install on '$device->{path}', here is some information about it:";
-    show_info_about_device($device);
+    unless(show_info_about_device($device)) {
+      say "Please do not continue, See the line above. But...";
+    }
     ask_for_confirmation("\nIf you are sure you have chosen the correct device, then please enter 'yes' to confirm and continue, otherwise enter 'no' to cancel: ");
 }
 
