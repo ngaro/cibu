@@ -4,12 +4,16 @@
 
 | Distro | ISO File | Result | Version | Tester | Notes |
 | --- | --- | --- | --- | --- | --- |
+| Arch Linux 2026.04.01 x86_64 | `archlinux-2026.04.01-x86_64.iso` | Pass | v0.2.2 | Briella Bugs | No issues found |
+| Debian Live 13.2.0 amd64 kde | `debian-live-13.2.0-amd64-kde.iso` | Pass | v0.2.2 | Briella Bugs | No issues found |
 | Debian Live 13.3.0 amd64 standard | `debian-live-13.3.0-amd64-standard.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | Debian Netinst 13.4.0 amd64 | `debian-13.4.0-amd64-netinst.iso` | Pass | v0.1.0 | Nikolas Garofil | Provides all it's boot options |
 | Kali Live 2026.1 amd64 | `kali-linux-2026.1-live-amd64.iso` | Pass | v0.1.0 | Nikolas Garofil | Both regular and forensic mode are tested |
+| EndeavourOS 2025.03.19 | `EndeavourOS_Mercury-Neo-2025.03.19.iso` | Pass | v0.2.2 | Briella Bugs | No issues found |
+| EndeavourOS 2026.03.06 | `EndeavourOS_Titan-2026.03.06.iso` | Fail | v0.2.2 | Briella Bugs | Kernel Panics, report at https://briellabugs.com/panic/eos2026 |
 | LMDE 7 amd64 | `lmde-7-cinnamon-64bit.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
-| Mint 22.3 Cinnamon amd64 | `linuxmint-22.3-cinnamon-64bit.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
-| Mint 22.3 XFCE amd64 | `linuxmint-22.3-xfce-64bit.iso` | Pass | v0.2.2 | Nikolas Garofil | No issues found |
+| Linux Mint 22.3 Cinnamon amd64 | `linuxmint-22.3-cinnamon-64bit.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
+| Linux Mint 22.3 XFCE amd64 | `linuxmint-22.3-xfce-64bit.iso` | Pass | v0.2.2 | Nikolas Garofil | No issues found |
 | MX Linux AHS amd64| `MX-25.1_Xfce_ahs_x64.iso` | Pass | v0.2.2 | Nikolas Garofil | Before v0.2.2 this didn't work |
 | NixOS 25.11 amd64 minimal | `nixos-minimal-25.11.8107.1073dad219cb-x86_64-linux.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | NixOS 25.11 amd64 graphical | `nixos-graphical-25.11.8107.1073dad219cb-x86_64-linux.iso` | Pass | v0.1.0 | Nikolas Garofil | Both Gnome and Plasma are tested |
