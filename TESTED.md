@@ -1,6 +1,5 @@
 - In general iso's working in GLIM will also work here. These are only the ones that were actually tested on CIBU. Feel free to report it when an iso works for you
-- You might sometimes see a iso here that was marked "Failed" being replaced by a slightly newer version marked "Pass". This means that CIBU was updated in such a way that both the newer and the older version of that iso are fixed.
-- An error in a change in the code might cause isos to fail in newer versions. If you need them urgently, use the Version-column to see in which CIBU version the last test was a success
+- If a ISO that fails has been fixed in a newer version of CIBU then it will no longer appear in the FAIL-list
 
 **ISO's that FAIL:**
 
