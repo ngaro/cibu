@@ -5,7 +5,6 @@
 
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
 | --- | --- | --- |  --- | --- | --- | --- |
-| EndeavourOS | 2026.03.06 | 2026.4.27 | `EndeavourOS_Titan-2026.04.27.iso` | v0.2.2 | Briella Bugs & Nikolas Garofil | Kernel Panics, report at https://briellabugs.com/panic/eos2026 |
 | NixOS amd64 minimal | 26.05 | 26.05 | `nixos-minimal-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | Jumps immediately back to CIBU menu |
 | NixOS amd64 graphical | 26.05 | 26.05 | `nixos-graphical-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | Jumps immediately back to CIBU menu |
 
@@ -18,7 +17,7 @@
 | Debian Live amd64 standard | 13.3.0 | 13.6.0 | `debian-live-13.6.0-amd64-standard.iso` | v0.2.2 | Nikolas Garofil | No issues found |
 | Debian Netinst amd64 | 13.4.0 | 13.6.0 |`debian-13.6.0-amd64-netinst.iso` | v0.2.2 | Nikolas Garofil | Provides all it's boot options |
 | Kali Live amd64 | 2026.1  | 2026.2 | `kali-linux-2026.2-live-amd64.iso` | v0.2.2 | Nikolas Garofil | Both regular and forensic mode are tested |
-| EndeavourOS | 2025.3.19 | 2025.03.19 | `EndeavourOS_Mercury-Neo-2025.03.19.iso` | v0.2.2 | Briella Bugs | No issues found |
+| EndeavourOS | 2025.3.19 | 2026.04.2 | `EndeavourOS_Titan-2026.04.27.iso` | v0.2.3 | Nikolas Garofil | No issues found |
 | LMDE amd64 | 7 | 7 |`lmde-7-cinnamon-64bit.iso` | v0.1.0 | Nikolas Garofil | No issues found |
 | Linux Mint Cinnamon amd64 | 22.3 | 22.3 | `linuxmint-22.3-cinnamon-64bit.iso` | v0.1.0 | Nikolas Garofil | No issues found |
 | Linux Mint XFCE amd64 | 22.3 | 22.3 | `linuxmint-22.3-xfce-64bit.iso` | v0.2.2 | Nikolas Garofil | No issues found |
