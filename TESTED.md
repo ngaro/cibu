@@ -24,6 +24,6 @@
 | NixOS amd64 minimal | 25.11 | 25.11 | `nixos-minimal-25.11.8107.1073dad219cb-x86_64-linux.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | NixOS amd64 graphical | 25.11 | 25.11 | `nixos-graphical-25.11.8107.1073dad219cb-x86_64-linux.iso` | Pass | v0.1.0 | Nikolas Garofil | Both Gnome and Plasma are tested |
 | SystemRescue amd64 | 13.0 | 13.0 | `systemrescue-13.00-amd64.iso` | Pass | v0.2.2 | Nikolas Garofil | Before v0.2.2 this didn't work |
-| Tails amd64 | 6.14.1 | 16.14.1 | `tails-amd64-6.14.1.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
+| Tails amd64 | 6.14.1 | 6.14.1 | `tails-amd64-6.14.1.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | Tails amd64 | 7.0 | 7.0 |`tails-amd64-7.0.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
 | Ubuntu Live Server amd64 | 24.0.4 | 24.0.4 | `ubuntu-24.04.4-live-server-amd64.iso` | Pass | v0.1.0 | Nikolas Garofil | No issues found |
