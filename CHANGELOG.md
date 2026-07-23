@@ -5,6 +5,15 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
+## Version 0.2.3 - Date of release: 2026-07-23 epoch time 1784825954
+### Features
+
+- Rewrote `TESTED.md`
+
+## Bug fixes
+
+- New EndeavourOS versions boot again (New versions are missing some files we expected)
+
 ## Version 0.2.2 - Date of release: 2026-04-20 epoch time 1776720663
 ### Bug fixes
 
