@@ -2,11 +2,10 @@
 - You might sometimes see a iso here that was marked "Failed" being replaced by a slightly newer version marked "Pass". This means that CIBU was updated in such a way that both the newer and the older version of that iso are fixed.
 - An error in a change in the code might cause isos to fail in newer versions. If you need them urgently, use the Version-column to see in which CIBU version the last test was a success
 
-
 **ISO's that FAIL:**
 
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- |  --- | --- | --- | --- |
 | EndeavourOS | 2026.03.06 | 2026.4.27 | `EndeavourOS_Titan-2026.04.27.iso` | v0.2.2 | Briella Bugs & Nikolas Garofil | Kernel Panics, report at https://briellabugs.com/panic/eos2026 |
 | NixOS amd64 minimal | 26.05 | 26.05 | `nixos-minimal-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | Jumps immediately back to CIBU menu |
 | NixOS amd64 graphical | 26.05 | 26.05 | `nixos-graphical-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | Jumps immediately back to CIBU menu |
@@ -14,7 +13,7 @@
 **ISO's that WORK:**
 
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
-| --- | --- | --- | --- | --- | --- | --- | --- |
+| --- | --- | --- |  --- | --- | --- | --- |
 | Arch Linux x86_64 | 2026.04.01 | 2026.07.01 | `archlinux-2026.07.01-x86_64.iso` | v0.2.2 | Briella Bugs | No issues found |
 | Debian Live amd64 kde | 13.2.0 | 13.6.0 | `debian-live-13.6.0-amd64-kde.iso` | v0.2.2 | Briella Bugs | No issues found |
 | Debian Live amd64 standard | 13.3.0 | 13.6.0 | `debian-live-13.6.0-amd64-standard.iso` | v0.2.2 | Nikolas Garofil | No issues found |
