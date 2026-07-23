@@ -17,7 +17,7 @@
 | Debian Live amd64 standard | 13.3.0 | 13.6.0 | `debian-live-13.6.0-amd64-standard.iso` | v0.2.2 | Nikolas Garofil | No issues found |
 | Debian Netinst amd64 | 13.4.0 | 13.6.0 |`debian-13.6.0-amd64-netinst.iso` | v0.2.2 | Nikolas Garofil | Provides all it's boot options |
 | Kali Live amd64 | 2026.1  | 2026.2 | `kali-linux-2026.2-live-amd64.iso` | v0.2.2 | Nikolas Garofil | Both regular and forensic mode are tested |
-| EndeavourOS | 2025.3.19 | 2026.04.2 | `EndeavourOS_Titan-2026.04.27.iso` | v0.2.3 | Nikolas Garofil | No issues found |
+| EndeavourOS | 2025.3.19 | 2026.4.27 | `EndeavourOS_Titan-2026.04.27.iso` | v0.2.3 | Nikolas Garofil | No issues found |
 | LMDE amd64 | 7 | 7 |`lmde-7-cinnamon-64bit.iso` | v0.1.0 | Nikolas Garofil | No issues found |
 | Linux Mint Cinnamon amd64 | 22.3 | 22.3 | `linuxmint-22.3-cinnamon-64bit.iso` | v0.1.0 | Nikolas Garofil | No issues found |
 | Linux Mint XFCE amd64 | 22.3 | 22.3 | `linuxmint-22.3-xfce-64bit.iso` | v0.2.2 | Nikolas Garofil | No issues found |
