@@ -46,7 +46,7 @@ desktop-image: "background.png"
 }
 
 + label {
-  text = "Cross-ISO boot Utility v0.2.3 - https://github.com/ngaro/cibu/"
+  text = "Cross-ISO boot Utility v0.2.4 - https://github.com/ngaro/cibu/"
   color = "#FFF"
   align = "center"
   left = 0
