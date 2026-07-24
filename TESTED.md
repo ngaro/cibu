@@ -1,14 +1,22 @@
-- In general iso's working in GLIM will also work here. These are only the ones that were actually tested on CIBU. Feel free to report it when an iso works for you
-- If a ISO that fails has been fixed in a newer version of CIBU then it will no longer appear in the FAIL-list
+# Tested ISO's
 
-**ISO's that FAIL:**
+- In general iso's working in GLIM will also work here. These are only the ones that were actually tested on CIBU. Feel free to report it when an iso works for you
+- If a ISO that fails has been fixed in a newer version of CIBU then it will be removed in the "Failing"-list
+
+## Failing ISO's
 
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
 | --- | --- | --- |  --- | --- | --- | --- |
-| NixOS amd64 minimal | 26.05 | 26.05 | `nixos-minimal-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | Jumps immediately back to CIBU menu |
-| NixOS amd64 graphical | 26.05 | 26.05 | `nixos-graphical-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | Jumps immediately back to CIBU menu |
+| NixOS amd64 minimal | 26.05 | 26.05 | `nixos-minimal-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | See _Notes_ |
+| NixOS amd64 graphical | 26.05 | 26.05 | `nixos-graphical-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | See _Notes_ |
 
-**ISO's that WORK:**
+### Notes:
+- About NixOS:
+  - 25.11 and older _do_ work _(both graphical and minimal)_.
+  - I am working on a solution. My current _(not yet pushed)_ solution for 26.05 can boot the kernel, load initrd, start systemd stage 1 but hangs when trying to mount the iso on `/sysroot`. More info later...
+  - If you just use the iso to install NixOS and not as a Live-system, you can use the (ugly) hack of installing 25.11 and upgrading
+
+## Working ISO's
 
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
 | --- | --- | --- |  --- | --- | --- | --- |
