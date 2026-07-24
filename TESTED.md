@@ -21,6 +21,8 @@
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
 | --- | --- | --- |  --- | --- | --- | --- |
 | Arch Linux x86_64 | 2026.04.01 | 2026.07.01 | `archlinux-2026.07.01-x86_64.iso` | v0.2.2 | Briella Bugs | No issues found |
+| CachyOS Desktop | 2026.06.28 | 2026.06.28 | `cachyos-desktop-260628.iso` | v0.2.4 | Nikolas Garofil | No issues found |
+| CachyOS Handheld | 2026.06.28 | 2026.06.28 | `cachyos-handheld-260628.iso` | v0.2.4 | Nikolas Garofil | No issues found |
 | Debian Live amd64 kde | 13.2.0 | 13.6.0 | `debian-live-13.6.0-amd64-kde.iso` | v0.2.2 | Briella Bugs | No issues found |
 | Debian Live amd64 standard | 13.3.0 | 13.6.0 | `debian-live-13.6.0-amd64-standard.iso` | v0.2.2 | Nikolas Garofil | No issues found |
 | Debian Netinst amd64 | 13.4.0 | 13.6.0 |`debian-13.6.0-amd64-netinst.iso` | v0.2.2 | Nikolas Garofil | Provides all it's boot options |
