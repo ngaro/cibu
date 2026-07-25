@@ -8,7 +8,7 @@ All notable changes to this project will be documented in this file
 ## Version 0.2.4 - Date of release: 2026-07-24 epoch time 1784906941
 ### Features
 
-- Added support for CachyOS Desktop and Handheld (Thanks to Cristoph Martin)
+- Added support for CachyOS Desktop and Handheld
 
 ## Version 0.2.3 - Date of release: 2026-07-23 epoch time 1784825954
 ### Features
