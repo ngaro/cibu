@@ -6,14 +6,14 @@ All notable changes to this project will be documented in this file
   - `z` increases with bug fixes
 
 ## Version 0.2.5 - Date of release: 2026-07-29 epoch time 1785341212
+### Bug fixes
+
+- AlmaLinux always visible (Was only the case with live media)
+
 ### Features
 
 - Added support for KDE neon
 - More iso's tested
-
-## Bug fixes
-
-- AlmaLinux always visible (Was only the case with live media)
 
 ## Version 0.2.4 - Date of release: 2026-07-24 epoch time 1784906941
 ### Features
@@ -25,7 +25,7 @@ All notable changes to this project will be documented in this file
 
 - Rewrote `TESTED.md`
 
-## Bug fixes
+### Bug fixes
 
 - New EndeavourOS versions boot again (New versions are missing some files we expected)
 
