@@ -20,13 +20,21 @@
 
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
 | --- | --- | --- |  --- | --- | --- | --- |
+| Antix | 23.2 | 23.2 | `antiX-23.2-net_x64-net.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| Antix runit | 23.2 | 23.2 | `antiX-23.2-runit-net_x64-net.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Arch Linux | 2026.04.01 | 2026.07.01 | `archlinux-2026.07.01-x86_64.iso` | v0.2.2 | Briella Bugs | No issues found |
+| Artix dinit | 20260402 | 20260402 | `artix-base-dinit-20260402-x86_64.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| Artix openrc | 20260402 | 20260402 | `artix-base-openrc-20260402-x86_64.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| Artix runit | 20260402 | 20260402 | `artix-base-runit-20260402-x86_64.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | CachyOS Desktop | 2026.06.28 | 2026.06.28 | `cachyos-desktop-260628.iso` | v0.2.4 | Nikolas Garofil | No issues found |
 | CachyOS Handheld | 2026.06.28 | 2026.06.28 | `cachyos-handheld-260628.iso` | v0.2.4 | Nikolas Garofil | No issues found |
 | Debian Live amd64 kde | 13.2.0 | 13.6.0 | `debian-live-13.6.0-amd64-kde.iso` | v0.2.2 | Briella Bugs | No issues found |
 | Debian Live amd64 standard | 13.3.0 | 13.6.0 | `debian-live-13.6.0-amd64-standard.iso` | v0.2.2 | Nikolas Garofil | No issues found |
 | Debian Netinst amd64 | 13.4.0 | 13.6.0 |`debian-13.6.0-amd64-netinst.iso` | v0.2.2 | Nikolas Garofil | Provides all it's boot options |
 | EndeavourOS | 2025.3.19 | 2026.4.27 | `EndeavourOS_Titan-2026.04.27.iso` | v0.2.3 | Nikolas Garofil | No issues found |
+| Fedora | 44.1.7 | 44.1.7 | `Fedora-Everything-netinst-44-1.7.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| Fedora Immutable | 44.1.7 | 44.1.7 | `Fedora-Silverblue-ostree-x86_64-44.1.7.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| Gparted | 1.8.0 | 1.8.0 | `gparted-live-1.8.0-2-amd64.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Kali Live amd64 | 2026.1  | 2026.2 | `kali-linux-2026.2-live-amd64.iso` | v0.2.2 | Nikolas Garofil | Both regular and forensic mode are tested |
 | KDE neon | 20260723  | 20260723 | `neon-user-desktop-20260723-0523.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Linux Mint Cinnamon amd64 | 22.3 | 22.3 | `linuxmint-22.3-cinnamon-64bit.iso` | v0.1.0 | Nikolas Garofil | No issues found |
