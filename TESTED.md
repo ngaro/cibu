@@ -20,6 +20,8 @@
 
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
 | --- | --- | --- |  --- | --- | --- | --- |
+| AlmaLinux | 10.2 | 10.2 | `AlmaLinux-10.2-x86_64-boot.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| AlmaLinux Live | 10.2 | 10.2 | `AlmaLinux-10.2-x86_64-Live-GNOME.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Antix | 23.2 | 23.2 | `antiX-23.2-net_x64-net.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Antix runit | 23.2 | 23.2 | `antiX-23.2-runit-net_x64-net.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Arch Linux | 2026.04.01 | 2026.07.01 | `archlinux-2026.07.01-x86_64.iso` | v0.2.2 | Briella Bugs | No issues found |
