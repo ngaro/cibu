@@ -9,6 +9,11 @@ All notable changes to this project will be documented in this file
 ### Features
 
 - Added support for KDE neon
+- More iso's tested
+
+## Bug fixes
+
+- AlmaLinux always visible (was only the case with live media)
 
 ## Version 0.2.4 - Date of release: 2026-07-24 epoch time 1784906941
 ### Features
