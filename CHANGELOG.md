@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
-## Version 0.2.5 - Unreleased
+## Version 0.2.5 - Date of release: 2026-07-29 epoch time 1785341212
 ### Features
 
 - Added support for KDE neon
@@ -13,7 +13,7 @@ All notable changes to this project will be documented in this file
 
 ## Bug fixes
 
-- AlmaLinux always visible (was only the case with live media)
+- AlmaLinux always visible (Was only the case with live media)
 
 ## Version 0.2.4 - Date of release: 2026-07-24 epoch time 1784906941
 ### Features
