@@ -37,6 +37,7 @@
 | Fedora | 44.1.7 | 44.1.7 | `Fedora-Everything-netinst-44-1.7.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Fedora Immutable | 44.1.7 | 44.1.7 | `Fedora-Silverblue-ostree-x86_64-44.1.7.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Gparted | 1.8.0 | 1.8.0 | `gparted-live-1.8.0-2-amd64.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| Grml | 2026.04 | 2026.04 | `grml-small-2026.04.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Kali Live amd64 | 2026.1  | 2026.2 | `kali-linux-2026.2-live-amd64.iso` | v0.2.2 | Nikolas Garofil | Both regular and forensic mode are tested |
 | KDE neon | 20260723  | 20260723 | `neon-user-desktop-20260723-0523.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Linux Mint Cinnamon amd64 | 22.3 | 22.3 | `linuxmint-22.3-cinnamon-64bit.iso` | v0.1.0 | Nikolas Garofil | No issues found |
