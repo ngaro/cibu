@@ -49,9 +49,9 @@
 ## Notes:
 - About Alpine:
   - The only way I got this to work was using an extra initrd (CIBU builds it when you install it). How it works:
-  -- The extra initrd contains only the file `cibu-init`
-  -- Grub instruct the kernel to use this as PID 1.
-  -- It makes sure that the iso is available as /dev/loop0 and then passes full control to `/init` in the real initrd
+    - The extra initrd contains only the file `cibu-init`
+    - Grub instruct the kernel to use this as PID 1.
+    - It makes sure that the iso is available as `/dev/loop0` and then passes full control to `/init` in the real initrd
   - Result: Everything seems to work fine, but you get an ugly error message during booting about openrc.
 - About NixOS:
   - 25.11 and older _do_ work _(both graphical and minimal)_.
