@@ -52,7 +52,9 @@
     - The extra initrd contains only the file `cibu-init`
     - Grub instruct the kernel to use this as PID 1.
     - It makes sure that the iso is available as `/dev/loop0` and then passes full control to `/init` in the real initrd
-  - Result: Everything seems to work fine, but you get an ugly error message during booting about openrc.
+  - Result:
+    - Everything seems to work fine on a vm, but you get an ugly error message during booting about openrc.
+    - iso is not found in real life
 - About NixOS:
   - 25.11 and older _do_ work _(both graphical and minimal)_.
   - I am working on a solution. My current _(not yet pushed)_ solution for 26.05 can boot the kernel, load initrd, start systemd stage 1 but hangs when trying to mount the iso on `/sysroot`. More info later...
