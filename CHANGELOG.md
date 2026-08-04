@@ -5,7 +5,10 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
-## Version 0.3.0 - Date of release: 2026-08-04 epoch time 1785860440
+## Version 0.3.0 - Work in progress
+### TODO
+- Make sure that /cibu-init finds the usb-stick
+
 ### Bug fixes
 - Booting systems without legacy support fixed
 

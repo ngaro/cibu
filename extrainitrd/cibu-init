@@ -30,11 +30,21 @@ modprobe ext4 && echo "Loaded ext4 module" > /dev/kmsg || echo "Failed to load e
 modprobe iso9660 && echo "Loaded iso9660 module" > /dev/kmsg || echo "Failed to load iso9660 module" > /dev/kmsg
 
 echo "Searching for the partition with label $isos_partlabel to mount the ISO from" > /dev/kmsg
-isos_partdev=""
-while [ -z "$isos_partdev" ]; do
+max_attempts=10
+for attempt in $(seq 1 $max_attempts); do
     echo "Waiting for device with label $isos_partlabel to be ready. Current visible devices:" > /dev/kmsg
     blkid > /dev/kmsg
     isos_partdev=$(blkid | grep "LABEL=\"$isos_partlabel\"" | cut -d: -f1)
+    if [ -z "$isos_partdev" ]; then
+        echo "Device with label $isos_partlabel not found, this was attempt $attempt of $max_attempts" > /dev/kmsg
+        if [ "$attempt" -eq "$max_attempts" ]; then
+            echo "Device with label $isos_partlabel not found after $attempt attempts, giving up and dropping to a shell for debugging..." > /dev/kmsg
+            exec /bin/sh
+        fi
+    else
+        echo "Found device with label $isos_partlabel: $isos_partdev" > /dev/kmsg
+        break
+    fi
     sleep 1
 done
 
