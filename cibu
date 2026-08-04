@@ -240,7 +240,7 @@ sub create_partitions {
     my $biospartsize = $wantedpartitions->[2]->{size};
     say "Creating the 3 partitions on '$device' needed by $name.";
     say "The 1st partition will be used for $name and will have a size of $cibupartsize, the 2nd partition for the iso files and the 3rd partition will be used as the BIOS Boot partition by GRUB.";
-    mysystem("sgdisk --new=1:0:+$cibupartsize $device"); # Create the first partition, starting at the beginning of the device, and using the specified size
+    mysystem("sgdisk --new=1:0:+$cibupartsize --typecode 1:ef00 $device"); # Create the first partition, starting at the beginning of the device, and using the specified size
     mysystem("sgdisk --new=3:-$biospartsize:0 --typecode=3:ef02 --partition-guid=3:21686148-6449-6E6F-744E-656564454649 $device"); # Create the third partition, starting at the end of the device, and using the specified size.
     #The 3rd partition will be used as the BIOS Boot partition by GRUB, so we have to make sure that it is 1MB, uses 21686148-6449-6E6F-744E-656564454649 as special GUID and typecode ef02 to indicate this
     mysystem("sgdisk --new=2:0:0 $device"); # Create the second partition, using the remaining space on the device
@@ -469,6 +469,7 @@ sub create_device_if_wanted {
   if($createdevice) {
     say ""; return create_new_device($device, $wantedpartitions, $ddlength);
   }
+  mysystem("sgdisk -t 1:ef00 $device"); #Set type code for EFI because old CIBU versions didn't do this.
   my ($cibupart, $isopart) = @{find_partitions_on_device($device)}[0,1];   #Partitions are not always just the device followed by a number
   mkfs($cibupart, $wantedpartitions->[0]); # Format the first partition as FAT32, and set its label
   mysystem("partprobe $device && sleep 3"); #Tell the OS about the new partition changes

@@ -16,7 +16,7 @@
 | --- | --- | --- |  --- | --- | --- | --- |
 | AlmaLinux | 10.2 | 10.2 | `AlmaLinux-10.2-x86_64-boot.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | AlmaLinux Live | 10.2 | 10.2 | `AlmaLinux-10.2-x86_64-Live-GNOME.iso` | v0.2.5 | Nikolas Garofil | No issues found |
-| Alpine Standard | 3.24.1 | 3.24.1 | `alpine-standard-3.24.1-x86_64.iso` | v0.3.0 | Nikolas Garofil | See Notes |
+| Alpine | 3.23.5 | 3.24.1 | `alpine-standard-3.24.1-x86_64.iso` | v0.3.0 | Nikolas Garofil | See Notes |
 | Antix | 23.2 | 23.2 | `antiX-23.2-net_x64-net.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Antix runit | 23.2 | 23.2 | `antiX-23.2-runit-net_x64-net.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Arch Linux | 2026.04.01 | 2026.07.01 | `archlinux-2026.07.01-x86_64.iso` | v0.2.2 | Briella Bugs | No issues found |
@@ -52,9 +52,7 @@
     - The extra initrd contains only the file `cibu-init`
     - Grub instruct the kernel to use this as PID 1.
     - It makes sure that the iso is available as `/dev/loop0` and then passes full control to `/init` in the real initrd
-  - Result:
-    - Everything seems to work fine on a vm, but you get an ugly error message during booting about openrc.
-    - iso is not found in real life
+  - Result: You get an ugly error message (about openrc) while booting but it seems to work fine.
 - About NixOS:
   - 25.11 and older _do_ work _(both graphical and minimal)_.
   - I am working on a solution. My current _(not yet pushed)_ solution for 26.05 can boot the kernel, load initrd, start systemd stage 1 but hangs when trying to mount the iso on `/sysroot`. More info later...

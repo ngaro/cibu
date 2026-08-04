@@ -5,10 +5,13 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
-## Version 0.3.0 - Date of release: 2026-08-03 epoch time 1785775651
+## Version 0.3.0 - Date of release: 2026-08-04 epoch time 1785860440
+### Bug fixes
+- Booting systems without legacy support fixed
+
 ### Features
 
-- CIBU build a simple extra initrd to help booting "annoying distros". See the Notes-section in `Tested.md` for more info.
+- CIBU builds a simple extra initrd to help booting "annoying distros". See the Notes-section in `Tested.md` for more info.
 - Added support for Alpine using the new initrd
 - More iso's tested
 
