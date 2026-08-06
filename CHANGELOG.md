@@ -11,6 +11,7 @@ All notable changes to this project will be documented in this file
 
 ### Bug fixes
 - Booting systems without legacy support fixed
+- Fix immediately not waiting until sync is done after dd
 
 ### Features
 

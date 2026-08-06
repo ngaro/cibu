@@ -224,7 +224,7 @@ sub wipe_and_create_table {
     my $partitions = find_partitions_on_device($device);
     say "Wiping '$device' and creating a new GPT partition table on it...";
     foreach(@$partitions) {
-        mysystem("dd if=/dev/zero of=$_ $ddlength conv=fsync"); #Wipe the beginning of each partition, $ddlength is a combination of the bs and count options of dd
+        mysystem("dd if=/dev/zero of=$_ $ddlength && sync"); #Wipe the beginning of each partition, $ddlength is a combination of the bs and count options of dd
     }
     mysystem("sgdisk --zap-all $device"); #Wipe the partition table
     mysystem("sgdisk --mbrtogpt $device"); #Create a new GPT partition table
