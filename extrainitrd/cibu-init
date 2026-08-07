@@ -20,14 +20,9 @@ done
 echo "We assume the ISO is located on a partition with the label '$isos_partlabel' and the path to the ISO is '$iso_path'" > /dev/kmsg
 
 echo "Loading necessary kernel modules for ISO mounting, (not yet loaded because we are still in cibu-init and not in the origin init yet)" > /dev/kmsg
-modprobe loop && echo "Loaded loop module" > /dev/kmsg || echo "Failed to load loop module" > /dev/kmsg
-modprobe squashfs && echo "Loaded squashfs module" > /dev/kmsg || echo "Failed to load squashfs module" > /dev/kmsg
-modprobe ahci && echo "Loaded ahci module" > /dev/kmsg || echo "Failed to load ahci module" > /dev/kmsg
-modprobe nvme && echo "Loaded nvme module" > /dev/kmsg || echo "Failed to load nvme module" > /dev/kmsg
-modprobe usb_storage && echo "Loaded usb_storage module" > /dev/kmsg || echo "Failed to load usb_storage module" > /dev/kmsg
-modprobe sd_mod && echo "Loaded sd_mod module" > /dev/kmsg || echo "Failed to load sd_mod module" > /dev/kmsg
-modprobe ext4 && echo "Loaded ext4 module" > /dev/kmsg || echo "Failed to load ext4 module" > /dev/kmsg
-modprobe iso9660 && echo "Loaded iso9660 module" > /dev/kmsg || echo "Failed to load iso9660 module" > /dev/kmsg
+for module in loop squashfs ahci xhci_pci ehci_pci nvme usb_storage sd_mod ext4 iso9660; do
+    modprobe "$module" && echo "Loaded $module module" > /dev/kmsg || echo "Failed to load $module module" > /dev/kmsg
+done
 
 echo "Searching for the partition with label $isos_partlabel to mount the ISO from" > /dev/kmsg
 max_attempts=10
