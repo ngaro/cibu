@@ -52,7 +52,7 @@ Copy your ISO files to the appropriate subdirectories in the `isos/` folder on t
 If the ISO for the distro you want to add doesn't have a subdir yet, it is not supported.
 
 Note that many ISO files are not yet tested in CIBU even if they have a subdir. But if they work in GLIM, they will probably also work here.<br>
-In the file [TESTED.md](TESTED.md) you can find a list of tested ISO filey will also work here.
+In the file [TESTED.md](TESTED.md) you can find a list of tested ISO files will also work here.
 
 If you require boot-parameter tweaks, edit the appropriate `boot/grub2/inc-<distroname>_.cfg`
 file on the first partition.<br>
