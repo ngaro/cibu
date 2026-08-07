@@ -48,11 +48,15 @@
 
 ## Notes:
 - About Alpine:
-  - The only way I got this to work was using an extra initrd (CIBU builds it when you install it). How it works:
-    - The extra initrd contains only the file `cibu-init`
-    - Grub instruct the kernel to use this as PID 1.
-    - It makes sure that the iso is available as `/dev/loop0` and then passes full control to `/init` in the real initrd
-  - Result: You get an ugly error message (about openrc) while booting but it seems to work fine.
+  - To get this to work I had to make an extra initrd (CIBU builds it when you install it, source is in "extrainitrd"). How it works:
+    - The extra initrd contains only the file `cibu-init`. By placing both the iso's and our own initrd in grub's initrd line we have the original initrd + cibu-init.
+    - We add kernel arguments in grub's vmlinuz line:
+      - `rdinit=/cibu-init` to make sure the kernel launches `/cibu-init` instead of the default `/init` (This is "reasonably" default)
+      - `alpine_dev=/dev/loop0` to tell `/init` what the root device is (This is from Alpine and only used by Alpine, not other distros)
+      - `isos_partlabel=ISOS` to tell cibu-init the label of the partition with the iso's (This is from CIBU and only used by cibu-init, not the OS)
+      - `iso_path=$isofile` to tell cibu init which iso to mount (This is from CIBU and only used by cibu-init, not the OS)
+    - cibu-init makes sure that the iso is available as `/dev/loop0` and then passes full control to `/init` in the iso's initrd
+  - Result: Besides an ugly error message (about openrc) while booting everything seems to work fine.
 - About NixOS:
   - 25.11 and older _do_ work _(both graphical and minimal)_.
   - I am working on a solution. My current _(not yet pushed)_ solution for 26.05 can boot the kernel, load initrd, start systemd stage 1 but hangs when trying to mount the iso on `/sysroot`. More info later...
