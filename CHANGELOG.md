@@ -5,14 +5,14 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
-## Version 0.3.0 - Date of release: 2026-08-07 epoch time 1786105083
+## Version 0.3.0 - Date of release: 2026-08-08 epoch time 1786142332
 ### Bug fixes
 - Booting systems without legacy support fixed
 - Use sync to make sure dd is finished before continuing when building
 
 ### Features
 
-- CIBU builds a simple extra initrd to help booting "annoying distros". See the Notes-section in `Tested.md` for more info.
+- CIBU builds a simple extra initrd to help booting "annoying distros". See the Notes-section in `TESTED.md` for more info.
 - Added support for Alpine using the new initrd
 - EFI Typecode for the CIBUSYS partition
 - More iso's tested

@@ -31,7 +31,7 @@ Editing booting parameters before booting (you only see this if you press 'e' wh
 
 Differences from [GLIM](https://github.com/thias/glim)
 --------------
-See [CHANGELOG.md](CHANGELOG.md) for full info. Most important things: Large isos are supported and partitioning is done for you.
+See [CHANGELOG.md](CHANGELOG.md) for full info. Most important things: Large isos are supported, partitioning is done for you and more distros will work.
 
 Installation
 ------------
@@ -97,7 +97,7 @@ Ways to contribute to CIBU and improve it for everyone:
  _(Also report ISO files that cause issues)_
  * Send PRs with `inc-distroname.cfg` files for distros that are not yet supported,
  or with tweaks for distros that fail. If possible, also add a picture of the distro's logo in high quality and a version that is shrunk with something like `convert -size 24x24 -background 'rgba(0,0,0,0)' original.svg small.png`
- * Send PRs that improve the inc-distroname.cfg files, the Perl script, or this README.md, ...
+ * Send PRs that improve the inc-distroname.cfg files, the Perl script, this README.md, ...
 
 Make sure to test everything properly before sending a PR.
 You might also want send a PR to [the GLIM repo](https://github.com/thias/glim), on which this software is based on, if it adds or improves an `inc-distroname.cfg` file.
