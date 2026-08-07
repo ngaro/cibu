@@ -7,8 +7,8 @@
 
 | Distro | First tested version | Last tested version | Last tested ISO | Version | Tester | Notes |
 | --- | --- | --- |  --- | --- | --- | --- |
-| NixOS amd64 minimal | 26.05 | 26.05 | `nixos-minimal-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | See _Notes_ |
-| NixOS amd64 graphical | 26.05 | 26.05 | `nixos-graphical-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | See _Notes_ |
+| NixOS amd64 minimal | 26.05 | 26.05 | `nixos-minimal-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | See _[Notes](TESTED.md#Notes)_ |
+| NixOS amd64 graphical | 26.05 | 26.05 | `nixos-graphical-26.05.5591.fd1462031fde-x86_64-linux.iso` | v0.2.2 | Nikolas Garofil | See _[Notes](TESTED.md#Notes)_ |
 
 ## Working ISO's
 
@@ -16,7 +16,7 @@
 | --- | --- | --- |  --- | --- | --- | --- |
 | AlmaLinux | 10.2 | 10.2 | `AlmaLinux-10.2-x86_64-boot.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | AlmaLinux Live | 10.2 | 10.2 | `AlmaLinux-10.2-x86_64-Live-GNOME.iso` | v0.2.5 | Nikolas Garofil | No issues found |
-| Alpine | 3.23.5 | 3.24.1 | `alpine-standard-3.24.1-x86_64.iso` | v0.3.0 | Nikolas Garofil | See Notes |
+| Alpine | 3.23.5 | 3.24.1 | `alpine-standard-3.24.1-x86_64.iso` | v0.3.0 | Nikolas Garofil | See _[Notes](TESTED.md#Notes)_ |
 | Antix | 23.2 | 23.2 | `antiX-23.2-net_x64-net.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Antix runit | 23.2 | 23.2 | `antiX-23.2-runit-net_x64-net.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Arch Linux | 2026.04.01 | 2026.07.01 | `archlinux-2026.07.01-x86_64.iso` | v0.2.2 | Briella Bugs | No issues found |
@@ -58,6 +58,6 @@
     - cibu-init makes sure that the iso is available as `/dev/loop0` and then passes full control to `/init` in the iso's initrd
   - Result: Besides an ugly error message (about openrc) while booting everything seems to work fine.
 - About NixOS:
-  - 25.11 and older _do_ work _(both graphical and minimal)_.
+  - 25.11 and older _do_ work _(both graphical and minimal)_ only 26.05 and newer fail.
   - I am working on a solution. My current _(not yet pushed)_ solution for 26.05 can boot the kernel, load initrd, start systemd stage 1 but hangs when trying to mount the iso on `/sysroot`. More info later...
   - If you just use the iso to install NixOS and not as a Live-system, you can use the (ugly) hack of installing 25.11 and upgrading
