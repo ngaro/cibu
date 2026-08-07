@@ -1,0 +1,65 @@
+#!/bin/sh
+
+# When you run this as first init instead of the official one the result will be that the iso your are booting will be available as /dev/loop0.
+# Use 'iso_path=' and 'isos_partlabel=' as kernel parameters to tell the location of the iso
+# Side-effects: Some modules will be loaded and a tiny part of /dev will be mounted
+
+echo "Setting up a basic environment"
+/bin/busybox --install -s /bin && echo "Busybox installed" || echo "Failed to install busybox"
+mount -t proc none /proc && echo "Mounted proc" || echo "Failed to mount proc"
+mount -t sysfs none /sys && echo "Mounted sysfs" || echo "Failed to mount sysfs"
+mount -t devtmpfs none /dev && echo "Mounted devtmpfs" || echo "Failed to mount devtmpfs" #From this point on, we can get output that we can examine with 'dmesg'
+
+echo "Parsing kernel command line for variables which tell us where to find the partition and the ISO" > /dev/kmsg
+for param in $(cat /proc/cmdline); do
+    case $param in
+      isos_partlabel=*) isos_partlabel="${param#*=}" ;;
+      iso_path=*) iso_path="${param#*=}" ;;
+    esac
+done
+echo "We assume the ISO is located on a partition with the label '$isos_partlabel' and the path to the ISO is '$iso_path'" > /dev/kmsg
+
+echo "Loading necessary kernel modules for ISO mounting, (not yet loaded because we are still in cibu-init and not in the origin init yet)" > /dev/kmsg
+for module in loop squashfs ahci xhci_pci ehci_pci nvme usb_storage sd_mod ext4 iso9660; do
+    modprobe "$module" && echo "Loaded $module module" > /dev/kmsg || echo "Failed to load $module module" > /dev/kmsg
+done
+
+echo "Searching for the partition with label $isos_partlabel to mount the ISO from" > /dev/kmsg
+max_attempts=10
+for attempt in $(seq 1 $max_attempts); do
+    echo "Waiting for device with label $isos_partlabel to be ready. Current visible devices:" > /dev/kmsg
+    blkid > /dev/kmsg
+    isos_partdev=$(blkid | grep "LABEL=\"$isos_partlabel\"" | cut -d: -f1)
+    if [ -z "$isos_partdev" ]; then
+        echo "Device with label $isos_partlabel not found, this was attempt $attempt of $max_attempts" > /dev/kmsg
+        if [ "$attempt" -eq "$max_attempts" ]; then
+            echo "Device with label $isos_partlabel not found after $attempt attempts, giving up and dropping to a shell for debugging..." > /dev/kmsg
+            exec /bin/sh
+        fi
+    else
+        echo "Found device with label $isos_partlabel: $isos_partdev" > /dev/kmsg
+        break
+    fi
+    sleep 1
+done
+
+echo "Device with label $isos_partlabel (which is $isos_partdev) is ready, proceeding to mount the partition and ISO" > /dev/kmsg
+mkdir -p /mnt/isospart && echo "Created mount point /mnt/isospart" > /dev/kmsg || echo "Failed to create mount point /mnt/isospart" > /dev/kmsg
+mount -o ro "$isos_partdev" /mnt/isospart > /dev/kmsg && echo "Mounted partition with label $isos_partlabel to /mnt/isospart" > /dev/kmsg || echo "Failed to mount partition with label $isos_partlabel to /mnt/isospart" > /dev/kmsg
+
+echo "Checking if the ISO file exists at /mnt/isospart${iso_path}" > /dev/kmsg
+if [ ! -f "/mnt/isospart${iso_path}" ]; then
+    echo "ISO file not found at /mnt/isospart${iso_path}, exiting..." > /dev/kmsg
+    exit 1
+fi
+
+echo "ISO file found at /mnt/isospart${iso_path}, proceeding to set up loop device" > /dev/kmsg
+losetup /dev/loop0 "/mnt/isospart${iso_path}" > /dev/kmsg && echo "Loop device /dev/loop0 set up for ISO" > /dev/kmsg || echo "Failed to set up loop device for ISO" > /dev/kmsg
+
+echo "Umounting /sys and /proc to make it cleaner for the initramfs from the ISO." > /dev/kmsg
+echo "We don't umount /dev because we used it for the mounts that happened." > /dev/kmsg
+umount /sys > /dev/kmsg && echo "Unmounted /sys" > /dev/kmsg || echo "Failed to unmount /sys" > /dev/kmsg
+umount /proc > /dev/kmsg && echo "Unmounted /proc" > /dev/kmsg || echo "Failed to unmount /proc" > /dev/kmsg
+
+echo "Switching to the /init in the real initramfs" > /dev/kmsg
+exec /init "$@" || echo "Failed to exec /init from the ISO" > /dev/kmsg
