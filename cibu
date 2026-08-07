@@ -1,6 +1,8 @@
 #!/usr/bin/env perl
 use strict; use warnings; use v5.30;
 use FindBin;
+use File::Temp qw/tempdir/;
+use Cwd qw/getcwd/;
 
 #Global variables that you probably don't want to change. They are here to prevent hardcoding
 my $name = "CIBU";
@@ -473,6 +475,20 @@ sub create_device_if_wanted {
   return [$cibupart, $isopart];
 }
 
+#Create the ramdisk at $initrd_result based on the contents of $initrd_contentdir. Most distro's will not need this
+#We can add this ramdisk in the initrd list of grub so that the file "/cibu-init" inside this becomes available
+#If you do this (and tell the kernel to run /cibu-init as PID 1) it will then make sure that the the iso you use becomes available as /dev/loop0.
+#This way "annoying" iso's (e.g. Alpine) can use this /dev/loop0 as device with the root filesystem
+#Afer /cibu-init has done it job it will switch to the real /init and continue booting as normal.
+sub create_initrd {
+  my ($initrd_contentdir, $initrd_result) = @_;
+
+  my $tempdir = tempdir(CLEANUP => 1) or die "Failed to create temporary directory: $!";
+  system("rsync -rp $initrd_contentdir/ $tempdir/") == 0 or die "Failed to run 'rsync -rpv $initrd_contentdir/ $tempdir/': $!";
+  system("cd $tempdir && find . -type f -print0 | cpio --null -ov --format=newc | gzip -9 > $initrd_result") == 0 or die "Failed to create initrd: $!";
+}
+
+
 #Settings (Don't mess around with them, the variablenames might change in the future)
 #WANTEDLABEL and PARTPATH in the mkfs entries will be replaced by the actual label and partition path when the mkfs function is called
 my $wantedpartitions = [
@@ -486,10 +502,11 @@ my $ddlength = 'bs=512 count=1024'; #The options given to dd to define the lengt
 my $user = run_as_root();
 showdisclaimer();
 ask_for_confirmation("Have you read, understood & fully accepted the disclaimer and the rest of the text above ?\nPlease enter 'yes' to accept and continue, otherwise enter 'no' to cancel: ");
-say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown));
+say ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown cpio gzip find));
 say ""; my $device = choose_device($wantedpartitions);
 say ""; my ($cibupart, $isopart) = @{create_device_if_wanted($device, $wantedpartitions, $ddlength)};
 say ""; my ($cibumnt, $grubconfigdir) = @{install_cibu($device, $cibupart)};
+say ""; create_initrd("./extrainitrd", "$cibumnt/cibu-initrd");
 say ""; my $isosmnt = create_isos_dirs($isopart, $grubconfigdir, $isosdir, $user);
 #Finishing up
 say ""; umount($cibupart, $isopart);
