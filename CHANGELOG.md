@@ -5,19 +5,22 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
-## Version 0.3.0 - Date of release: 2026-08-08 epoch time 1786142332
+## Version 0.3.1 - Date of release: 2026-08-19
+## Features
+- Accepts command line arguments to show help (-h), choose a device (-d), quiet mode (-q) and skip the interactive questions (-f)
+
+## Version 0.3.0 - Date of release: 2026-08-08
 ### Bug fixes
 - Booting systems without legacy support fixed
 - Use sync to make sure dd is finished before continuing when building
 
 ### Features
-
-- CIBU builds a simple extra initrd to help booting "annoying distros". See the Notes-section in `TESTED.md` for more info.
+- CIBU builds a simple extra initrd to help booting "annoying distros". See the [Notes-section in TESTED.md](TESTED.md#Notes) for more info.
 - Added support for Alpine using the new initrd
 - EFI Typecode for the CIBUSYS partition
 - More iso's tested
 
-## Version 0.2.5 - Date of release: 2026-07-29 epoch time 1785341212
+## Version 0.2.5 - Date of release: 2026-07-29
 ### Bug fixes
 
 - AlmaLinux always visible (Was only the case with live media)
@@ -27,21 +30,21 @@ All notable changes to this project will be documented in this file
 - Added support for KDE neon
 - More iso's tested
 
-## Version 0.2.4 - Date of release: 2026-07-24 epoch time 1784906941
+## Version 0.2.4 - Date of release: 2026-07-24
 ### Features
 
 - Added support for CachyOS Desktop and Handheld
 
-## Version 0.2.3 - Date of release: 2026-07-23 epoch time 1784825954
+## Version 0.2.3 - Date of release: 2026-07-23
 ### Features
 
-- Rewrote `TESTED.md`
+- Rewrote [TESTED.md](TESTED.md)
 
 ### Bug fixes
 
 - New EndeavourOS versions boot again (New versions are missing some files we expected)
 
-## Version 0.2.2 - Date of release: 2026-04-20 epoch time 1776720663
+## Version 0.2.2 - Date of release: 2026-04-20
 ### Bug fixes
 
 - Fixes issue https://github.com/ngaro/cibu/issues/3 _(ISOS that depend on the $rootuuid variable now work correctly)_
@@ -49,26 +52,26 @@ All notable changes to this project will be documented in this file
 ### Extra tested iso's
 - Mint 22.3 XFCE, SystemRescue 13, MX Linux 25.11
 
-## Version 0.2.1 - Date of release: 2026-04-20 epoch time 1776707817
+## Version 0.2.1 - Date of release: 2026-04-20
 ### Bug fixes
 
 - Fixes issue https://github.com/ngaro/cibu/issues/2 _(CIBU no longer errors out but just warns with "strange" block devices and allows the user to force their usage )_
 
-## Version 0.2.0 - Date of release: 2026-04-17 epoch time 1776432123
+## Version 0.2.0 - Date of release: 2026-04-17
 ### Features
 
 - Shows more info about the found devices to help users choose.
 - Makes it possible to upgrade/reinstall CIDU without wiping the ISOS-partition (forcing you to manually copy all your iso's back).
 
-## Version 0.1.0 - Date of release: 2026-04-14 epoch time 1776196058
+## Version 0.1.0 - Date of release: 2026-04-14
 ### Changes
 
-- Added file `CHANGELOG.md`
+- Added file [CHANGELOG.md](CHANGELOG.md)
 - Changed `grub2/inc-debian.cfg` to support Debian Netinst images
 - Changed screenshots of GLIM to those of CIDU
-- Acknowledged the authors of GLIM and added a `LICENSE` file with the GNU General Public License v3.0
-- Added a `TESTED.md` file with a list of tested isos and some info
-- Rewrote `README.md` only keeping the "Special Cases" section
+- Acknowledged the authors of GLIM and added a [LICENSE](LICENSE) file with the GNU General Public License v3.0
+- Added a [TESTED.md](TESTED.md) file with a list of tested isos and some info
+- Rewrote [README.md](TESTED.md) only keeping the "Special Cases" section
 - Added a mention of the version (on the 2nd line of `grub2/grub.cfg`)
 - Removed `glim.sh` and took the main ideas to rewrite into `cidu`. Main changes:
   - Perl instead of shell to make it easier to maintain and add features
