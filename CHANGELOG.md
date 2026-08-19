@@ -5,14 +5,17 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
+## Version 0.3.1 - WiP
+## Features
+- Accepts command line arguments to show help (-h), choose a device (-d) and skip the interactive questions (-f)
+
 ## Version 0.3.0 - Date of release: 2026-08-08 epoch time 1786142332
 ### Bug fixes
 - Booting systems without legacy support fixed
 - Use sync to make sure dd is finished before continuing when building
 
 ### Features
-
-- CIBU builds a simple extra initrd to help booting "annoying distros". See the Notes-section in `TESTED.md` for more info.
+- CIBU builds a simple extra initrd to help booting "annoying distros". See the [Notes-section in TESTED.md](TESTED.md#Notes) for more info.
 - Added support for Alpine using the new initrd
 - EFI Typecode for the CIBUSYS partition
 - More iso's tested
@@ -35,7 +38,7 @@ All notable changes to this project will be documented in this file
 ## Version 0.2.3 - Date of release: 2026-07-23 epoch time 1784825954
 ### Features
 
-- Rewrote `TESTED.md`
+- Rewrote [TESTED.md](TESTED.md)
 
 ### Bug fixes
 
@@ -63,12 +66,12 @@ All notable changes to this project will be documented in this file
 ## Version 0.1.0 - Date of release: 2026-04-14 epoch time 1776196058
 ### Changes
 
-- Added file `CHANGELOG.md`
+- Added file [CHANGELOG.md](CHANGELOG.md)
 - Changed `grub2/inc-debian.cfg` to support Debian Netinst images
 - Changed screenshots of GLIM to those of CIDU
-- Acknowledged the authors of GLIM and added a `LICENSE` file with the GNU General Public License v3.0
-- Added a `TESTED.md` file with a list of tested isos and some info
-- Rewrote `README.md` only keeping the "Special Cases" section
+- Acknowledged the authors of GLIM and added a [LICENSE](LICENSE) file with the GNU General Public License v3.0
+- Added a [TESTED.md](TESTED.md) file with a list of tested isos and some info
+- Rewrote [README.md](TESTED.md) only keeping the "Special Cases" section
 - Added a mention of the version (on the 2nd line of `grub2/grub.cfg`)
 - Removed `glim.sh` and took the main ideas to rewrite into `cidu`. Main changes:
   - Perl instead of shell to make it easier to maintain and add features
