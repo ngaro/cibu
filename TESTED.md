@@ -42,6 +42,7 @@
 | NixOS amd64 graphical | 25.11 | 25.11 | `nixos-graphical-25.11.8107.1073dad219cb-x86_64-linux.iso` | v0.1.0 | Nikolas Garofil | Both Gnome and Plasma are tested |
 | NixOS amd64 minimal | 25.11 | 25.11 | `nixos-minimal-25.11.8107.1073dad219cb-x86_64-linux.iso` | v0.1.0 | Nikolas Garofil | No issues found |
 | OpenBSD | 7.9 | 7.9 | `cd79.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| Pop!_OS | 24.04 | 24.04 | `pop-os_24.04_amd64_nvidia_27.iso` | v0.3.1 | Nikolas Garofil | No issues found |
 | SystemRescue amd64 | 13.0 | 13.01 | `systemrescue-13.01-amd64.iso` | v0.2.2 | Nikolas Garofil | Before v0.2.2 this didn't work |
 | Tails amd64 | 6.14.1 | 7.10 | `tails-amd64-7.10.iso` | v0.2.2 | Nikolas Garofil | No issues found |
 | Ubuntu Live Server amd64 | 24.04.4 | 26.04  | `ubuntu-26.04-live-server-amd64.iso` | v0.2.2 | Nikolas Garofil | No issues found |
