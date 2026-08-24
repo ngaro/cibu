@@ -1,6 +1,5 @@
 #!/usr/bin/env perl
 use strict; use warnings; use v5.30;
-use FindBin;
 use File::Temp qw/tempdir/;
 use Cwd qw/getcwd/;
 
@@ -324,13 +323,6 @@ sub grub_grub2_choice {
     return $grubversion;
 }
 
-#Returns the absolute to the grub2 config directory which should be located in the same directory as this script. Prints an error message and exits with code 1 if the grub2 config directory or the grub.cfg file inside it is not found.
-sub find_and_check_grub_dir {
-    my $grubconfigdir = $FindBin::Bin . '/grub2';
-    return $grubconfigdir if -d $grubconfigdir && -f "$grubconfigdir/grub.cfg";
-    myerror "grub.cfg not found.";
-}
-
 #Unmounts the partitions passed as arguments if they are mounted. If a partition is not mounted, it will be skipped. If a partition is mounted multiple times, they will all be unmounted.
 sub umount {
     my @partitions = @_;
@@ -459,19 +451,18 @@ sub create_new_device {
 }
 
 #Installs cibu on a device that already has the correct partition table.
-#First argument is the device, 2nd argument the cibu partition
-#It is expected that the cibu partition already has the correct label and (empty) filesystem. Returns a arrayref with the mountpoint of the cibu partition and the path of the config dir there
+#First argument is the device, 2nd argument the cibu partition, 3rd is the dir where the grub config files are located
+#It is expected that the cibu partition already has the correct label and (empty) filesystem. Returns the mountpoint of the cibu partition
 sub install_cibu {
-    my ($devpath, $cibupart) = @_;
+    my ($devpath, $cibupart, $grubconfigdir) = @_;
     mysay "Installing CIBU on the device...";
     mysay ""; my $grubversion = grub_grub2_choice();
-    mysay ""; my $grubconfigdir = find_and_check_grub_dir();
     mysay ""; umount($cibupart); #Just in case it's automounted
     mysay ""; my $cibumnt = mount($cibupart);
     mysay ""; my $support = check_bios_efi_support();
     mysay ""; install_grub($grubversion->{installer}, $support, $cibumnt, $devpath);
     mysay ""; copy_grub_config($grubconfigdir, "$cibumnt/boot/$grubversion->{configdir}");
-    return [$cibumnt, $grubconfigdir];
+    return $cibumnt;
 }
 
 #If $devpath is not a $cibudevice, prepares it using create_new_device(). (see info there about the arguments)
@@ -509,9 +500,9 @@ sub create_device_if_wanted {
 sub create_initrd {
     my ($initrd_contentdir, $initrd_result) = @_;
 
-    my $tempdir = tempdir(CLEANUP => 1) or die "Failed to create temporary directory: $!";
-    system("rsync -rp $initrd_contentdir/ $tempdir/") == 0 or die "Failed to run 'rsync -rpv $initrd_contentdir/ $tempdir/': $!";
-    system("cd $tempdir && find . -type f -print0 | cpio --null -ov --format=newc | gzip -9 > $initrd_result") == 0 or die "Failed to create initrd: $!";
+    my $tempdir = tempdir(CLEANUP => 1) or myerror "Failed to create temporary directory: $!";
+    mysystem("rsync -rp $initrd_contentdir/ $tempdir/");
+    mysystem("cd $tempdir && find . -print0 | cpio --null -ov --format=newc | gzip -9 > $initrd_result");
 }
 
 
@@ -549,6 +540,14 @@ END
     exit(0);
 }
 
+#Find the dir with the cibu binary (follow all symlinks) and return it (without trailing slash)
+sub find_dir_with_cibu_binary {
+    my $location = $0;
+    $location = readlink($location) while (-l $location);
+    $location =~ s/\/[^\/]+$//;
+    return $location;
+}
+
 
 $settings = read_commandline_options();
 show_help() if $settings->{help};
@@ -560,8 +559,9 @@ unless($settings->{force} or $settings->{quiet}) {
 mysay ""; check_available_programs(qw(lsblk fdisk sgdisk partprobe mkfs.fat mkfs.ext4 mount mktemp rsync mount umount mkdir chown cpio gzip find));
 mysay ""; my $devpath = choose_device();
 mysay ""; my ($cibupart, $isopart) = @{create_device_if_wanted($devpath, $ddlength)};
-mysay ""; my ($cibumnt, $grubconfigdir) = @{install_cibu($devpath, $cibupart)};
-mysay ""; create_initrd("./extrainitrd", "$cibumnt/cibu-initrd");
+my $cibudir = find_dir_with_cibu_binary(); my $grubconfigdir = "$cibudir/grub2";
+mysay ""; my $cibumnt = install_cibu($devpath, $cibupart, $grubconfigdir);
+mysay ""; create_initrd("$cibudir/extra_initrds/alpine", "$cibumnt/alpine-initrd");
 mysay ""; my $isosmnt = create_isos_dirs($isopart, $grubconfigdir, $isosdir, $user);
 #Finishing up
 mysay ""; umount($cibupart, $isopart);

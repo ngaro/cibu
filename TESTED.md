@@ -49,7 +49,7 @@
 
 ## Notes:
 - About Alpine:
-  - To get this to work I had to make an extra initrd (CIBU builds it when you install it, source is in "extrainitrd"). How it works:
+  - To get this to work I had to make an extra initrd. _(CIBU builds it during the installation , source is in `extra_initrds/alpine`)_. How it works:
     - The extra initrd contains only the file `cibu-init`. By placing both the iso's and our own initrd in grub's initrd line we have the original initrd + cibu-init.
     - We add kernel arguments in grub's vmlinuz line:
       - `rdinit=/cibu-init` to make sure the kernel launches `/cibu-init` instead of the default `/init` (This is "reasonably" default)
