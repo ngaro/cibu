@@ -562,6 +562,7 @@ mysay ""; my ($cibupart, $isopart) = @{create_device_if_wanted($devpath, $ddleng
 my $cibudir = find_dir_with_cibu_binary(); my $grubconfigdir = "$cibudir/grub2";
 mysay ""; my $cibumnt = install_cibu($devpath, $cibupart, $grubconfigdir);
 mysay ""; create_initrd("$cibudir/extra_initrds/alpine", "$cibumnt/alpine-initrd");
+mysay ""; create_initrd("$cibudir/extra_initrds/nixos", "$cibumnt/nixos-initrd");
 mysay ""; my $isosmnt = create_isos_dirs($isopart, $grubconfigdir, $isosdir, $user);
 #Finishing up
 mysay ""; umount($cibupart, $isopart);
