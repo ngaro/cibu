@@ -1,0 +1,9 @@
+[Unit]
+Description=Setup NixOS ISO Loop Device
+DefaultDependencies=no
+After=systemd-udevd.service
+Before=initrd-root-device.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/findiso.sh
