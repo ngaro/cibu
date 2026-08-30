@@ -23,6 +23,8 @@
 | Artix dinit | 20260402 | 20260402 | `artix-base-dinit-20260402-x86_64.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Artix openrc | 20260402 | 20260402 | `artix-base-openrc-20260402-x86_64.iso` | v0.2.5 | Nikolas Garofil | No issues found |
 | Artix runit | 20260402 | 20260402 | `artix-base-runit-20260402-x86_64.iso` | v0.2.5 | Nikolas Garofil | No issues found |
+| Bazzite Desktop | 2026.08.30 | 2026.08.30 | `bazzite-gnome-stable-live-amd64.iso` | v0.3.2 | Alex Dean | No issues found |
+| Bazzite Desktop | 2026.08.30 | 2026.08.30 | `bazzite-stable-live-amd64.iso` | v0.3.2 | Alex Dean | No issues found |
 | CachyOS Desktop | 2026.06.28 | 2026.06.28 | `cachyos-desktop-260628.iso` | v0.2.4 | Nikolas Garofil | No issues found |
 | CachyOS Handheld | 2026.06.28 | 2026.06.28 | `cachyos-handheld-260628.iso` | v0.2.4 | Nikolas Garofil | No issues found |
 | Debian Live amd64 kde | 13.2.0 | 13.6.0 | `debian-live-13.6.0-amd64-kde.iso` | v0.2.2 | Briella Bugs | No issues found |
