@@ -5,6 +5,11 @@ All notable changes to this project will be documented in this file
   - `y` increases with new features. As long as there no 5 testers compatibility breaking features will update `y` and not `x`
   - `z` increases with bug fixes
 
+## Version 0.3.3 - IN DEVELOPMENT
+## Features
+- Support for Parrot and Bazzite
+- Create `$settings->{grublibdir}` for users where grub is not in `/usr/lib/grub`
+
 ## Version 0.3.2 - Date of release: 2026-08-24
 ### Bug fixes
 - CIBU crashed when not launched from it's own dir.
