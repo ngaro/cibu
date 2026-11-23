@@ -13,7 +13,7 @@ a different USB stick for every iso they want to boot from.
 
 If you found this repo, you probably already found [Ventoy](https://www.ventoy.net/en/index.html) too.<br>
 It's undeniable that Ventoy is a tool with way more features.<br>
-But... **Ventoy has [well documented concerns](https://en.wikipedia.org/wiki/Ventoy#Concerns_over_software_security_and_validity_of_open_source_claim) about its security and the validity of its open-source claims !**<br>
+But... **There are lot of concerns about Ventoy's security, trustworthiness and validity of its open-source claims !**<br>*(See all the links in the [controversy section of this revision of it's Wikipedia page](https://en.wikipedia.org/w/index.php?title=Ventoy&oldid=1377965868#Binary_blob_controversy) for more info).*<br>
 Because of this it's usage is often forbidden in environments where security is an important factor.<br>
 CIBU, on the other hand, is completely open and has source code that is easy to read and well documented.<br>
 The only blobs inside are the images _(which you can replace if you want)_.
